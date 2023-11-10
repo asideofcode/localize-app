@@ -1,0 +1,28 @@
+/* CoffeeOrderScenario.module.css */
+.container {
+  padding: 20px;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.selectionArea {
+  margin: 10px 0;
+}
+
+.coffeeButton {
+  margin-right: 5px;
+  padding: 5px 15px;
+}
+
+.confirmButton {
+  margin-top: 10px;
+  padding: 5px 15px;
+  background-color: #4CAF50;
+  color: white;
+}
+
+.confirmButton:hover {
+  background-color: #45a049;
+}
+
