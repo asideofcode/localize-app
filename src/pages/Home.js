@@ -33,7 +33,7 @@ const Home = () => {
   return (
     <>
       <h1>localize</h1>
-      <p>Helping you figure out your locale through fun and challenging exercises</p>
+      <p>Helping international students to localize, through fun and challenging exercises</p>
       <div>
         <ScenarioList />
       </div>
