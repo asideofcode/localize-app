@@ -68,16 +68,24 @@ const Scenario = () => {
 
   const [currentSceneId, setCurrentSceneId] = useState(scenarioData[0].id);
   const [lastFeedback, setLastFeedback] = useState('');
+  const [clickedOption, setClickedOption] = useState(undefined);
 
   const currentScene = scenarioData.find(scene => scene.id === currentSceneId);
 
   const handleOptionClick = (option) => {
-    setLastFeedback(option.feedback);
-
-    if (!currentScene.mustBeCorrect || (currentScene.mustBeCorrect && option.isCorrect)) {
-      setCurrentSceneId(option.nextScene);
-    }
+    setClickedOption(option);
   };
+
+  const handleCheckClick = () => {
+    if (!clickedOption) return;
+
+    setLastFeedback(clickedOption.feedback);
+
+    if (!currentScene.mustBeCorrect || (currentScene.mustBeCorrect && clickedOption.isCorrect)) {
+      setCurrentSceneId(clickedOption.nextScene);
+      setClickedOption(undefined);
+    }
+  }
 
   return (
     <div className={styles.container}>
@@ -87,11 +95,16 @@ const Scenario = () => {
       </button>
 
       <p>{currentScene.narrative}</p>
-      {currentScene.options.map((option, index) => (
-        <button key={index} onClick={() => handleOptionClick(option)}>
-          {option.text}
-        </button>
-      ))}
+      <ul className={styles.mcqChoices}>
+        {currentScene.options.map((option, index) => (
+          <li key={index}>
+            <button className={`${styles.mcqChoice} ${option === clickedOption ? styles.active : ''}`} key={index} onClick={() => handleOptionClick(option)}>
+              {option.text}
+            </button>
+          </li>
+        ))}
+      </ul>
+      <button disabled={!clickedOption} className={styles.mcqCheck} onClick={handleCheckClick}>Check</button>
       {lastFeedback && <p>{lastFeedback}</p>}
     </div>
   );
