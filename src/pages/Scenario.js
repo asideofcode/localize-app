@@ -90,8 +90,8 @@ const Scenario = () => {
   return (
     <div className={styles.container}>
       Scenario: {id}
-      <button onClick={() => navigate(-1)} className={styles.exitButton}>
-        X
+      <button onClick={() => navigate('/')} className={styles.exitButton}>
+        x
       </button>
 
       <p>{currentScene.narrative}</p>
