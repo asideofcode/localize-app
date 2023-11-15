@@ -16,8 +16,8 @@ const ScenarioList = () => {
       <ul className={styles.list}>
         {scenarios.map((scenario) => (
 
-          <Link to={`/scenario/${scenario.id}`} className={styles.link}>
-            <li key={scenario.id} className={styles.listItem}>
+          <Link key={scenario.id} to={`/scenario/${scenario.id}`} className={styles.link}>
+            <li className={styles.listItem}>
               {scenario.title}
             </li>
           </Link>
