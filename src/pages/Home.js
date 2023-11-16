@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import styles from './Home.module.css';
 
 const scenarios = [
-  { id: 1, title: 'Public Transportation Navigation' },
-  { id: 2, title: 'Dialog' },
-  { id: 3, title: 'Coffee Shop' },
+  { id: 1, title: 'Visiting Bath City Centre' },
+  // { id: 2, title: 'Dialog' },
+  // { id: 3, title: 'Coffee Shop' },
   // Add more scenarios here
 ];
 
@@ -16,8 +16,8 @@ const ScenarioList = () => {
       <ul className={styles.list}>
         {scenarios.map((scenario) => (
 
-          <Link to={`/scenario/${scenario.id}`} className={styles.link}>
-            <li key={scenario.id} className={styles.listItem}>
+          <Link key={scenario.id} to={`/scenario/${scenario.id}`} className={styles.link}>
+            <li className={styles.listItem}>
               {scenario.title}
             </li>
           </Link>
@@ -33,7 +33,7 @@ const Home = () => {
   return (
     <>
       <h1>localize</h1>
-      <p>Helping international students to localize, through fun and challenging exercises</p>
+      <p>an interactive, web-based platform designed to help international students familiarize themselves with their new host countries.</p>
       <div>
         <ScenarioList />
       </div>

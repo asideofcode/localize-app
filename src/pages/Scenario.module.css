@@ -20,3 +20,44 @@
 .exitButton:hover {
   background-color: #d32f2f;
 }
+
+.mcqChoice {
+  display: block;
+  width:  100%;;
+  padding: 10px 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.mcqChoice.active, .mcqChoice:hover.active {
+  background-color: #ddf4ff;
+}
+
+.mcqChoice:hover {
+  background-color: #ddd;
+}
+
+ul.mcqChoices {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  max-width: 500px;
+}
+
+.mcqCheck {
+  display: block;
+  padding: 10px 20px;
+  background-color: #58cc02;
+  border: 1px solid #61e001;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.mcqCheck:hover {
+  background-color: #61e001;
+}
