@@ -3,10 +3,7 @@ import { Link } from 'react-router-dom';
 import styles from './Home.module.css';
 
 const scenarios = [
-  { id: 1, title: 'Visiting Bath City Centre' },
-  // { id: 2, title: 'Dialog' },
-  // { id: 3, title: 'Coffee Shop' },
-  // Add more scenarios here
+  { id: "7G5jd0H02t1Y9fS2xfTd", title: 'Visiting Bath City Centre' },
 ];
 
 const ScenarioList = () => {
