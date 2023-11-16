@@ -1,33 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import styles from './DialogScenario.module.css'; // Assume you've created corresponding styles
 import { useNavigate, useLocation } from 'react-router-dom';
-import { queryById } from '../Firebase.js';
-
-function dialogueObject(id, icon, text, options) {
-    this.id = id; // unique identifier that can be used as query text
-    this.icon = icon; // string (emoji)
-    this.text = text; // string - NPC's opening line
-    this.options = options; // map - each 'option' has two key-value pairs - nextState: string, text: string.
-}
-
-const greeting1 = new dialogueObject("","","",[])
-queryById("dialogue_states", "bank1").then( (it) => {
-    greeting1.id = it.id;
-    greeting1.icon = it.icon;
-    greeting1.text = it.text;
-    greeting1.options = it.options;
-    console.log(greeting1.text);
-});
 
 const dialogStates = {
     greeting: {
-        icon: greeting1.icon,
-        text: greeting1.text,
+        icon: "👩‍💻",
+        text: "Hello! Welcome to our virtual bank. How can we assist you today?",
         options: [
-            //{ text: greeting1.options[0].text, nextState: greeting1.options[0].nextState },
-            //{ text: greeting1.options[1].text, nextState: greeting1.options[1].nextState },
-            { text: "I'd like to open a new account", nextState: "openAccount" },
-            { text: "I need assistance with my current account", nextState: "currentAccountHelp" },
+            { text: "I'd like to open a new account.", nextState: "openAccount" },
+            { text: "I need assistance with my current account.", nextState: "currentAccountHelp" },
         ],
     },
     openAccount: {
@@ -73,21 +54,12 @@ const DialogScenario = () => {
 
     // Set the current state based on the URL, defaulting to 'greeting'
     const [currentState, setCurrentState] = useState(stateFromQuery || 'greeting');
-    const [ddialogStates, setDdialogStates] = useState({});
-    const currentDialog = ddialogStates[currentState];
+    const currentDialog = dialogStates[currentState];
 
 
     const handleOptionClick = (nextState) => {
         setCurrentState(nextState);
     };
-
-    useEffect(() => {
-        new Promise(res => {
-            setTimeout(() => {
-                setDdialogStates(dialogStates)
-            }, 3000)
-        })
-    }, []);
 
     useEffect(() => {
         const handlePopState = (event) => {
@@ -127,8 +99,7 @@ const DialogScenario = () => {
                 X
             </button>
             <p className={styles.dialogText}><span style={{ fontSize: '50px' }}>{currentDialog.icon}</span> {currentDialog.text}</p>
-            {!currentDialog && "Loading"}
-            {ccurrentDialog && urrentDialog.options && (
+            {currentDialog.options && (
                 <div className={styles.optionsContainer}>
                     {currentDialog.options.map((option, index) => (
                         <button
