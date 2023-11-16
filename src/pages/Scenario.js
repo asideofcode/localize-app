@@ -17,7 +17,7 @@ const ScenarioContainer = () => {
   useEffect(() => {
     setLoading(true);
 
-    fetchScenario('7G5jd0H02t1Y9fS2xfTd')
+    fetchScenario(id)
       .then(data => {
         if (!data) {
           setError('No data returned from backend');
@@ -34,7 +34,7 @@ const ScenarioContainer = () => {
         setLoading(false);
       });
 
-  }, []);
+  }, [id]);
 
   return (
     <div className={styles.container}>
