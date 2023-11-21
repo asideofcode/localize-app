@@ -37,10 +37,10 @@ const ScenarioList = () => {
     <div className={styles.container}>
       <h1 className={styles.title}>Select a Scenario</h1>
       {error && <p>{error}</p>}
-      {loading && <p>Loading...</p>}
       {
-        scenarios.length && (
+        loading ? <p>Loading...</p> :
           <ul className={styles.list}>
+            {scenarios.length == 0 && <p>We're all out of scenarios :(</p>}
             {scenarios.map((scenario) => (
 
               <Link key={scenario.id} to={`/scenario/${scenario.id}`} className={styles.link}>
@@ -51,7 +51,6 @@ const ScenarioList = () => {
 
             ))}
           </ul>
-        )
       }
     </div >
   );
