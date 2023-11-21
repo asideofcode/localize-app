@@ -4,7 +4,7 @@ import styles from './Scenario.module.css';
 import { fetchScenario } from '../backendService';
 // import exampleScenario from './scenario.json';
 
-const ScenarioContainer = () => {
+const Scenario = () => {
   let { id } = useParams();
   let navigate = useNavigate();
 
@@ -12,6 +12,7 @@ const ScenarioContainer = () => {
   const [error, setError] = useState(null);
   const [currentSceneId, setCurrentSceneId] = useState(undefined);
   const [scenes, setScenes] = useState([]);
+  const [scenesCompleted, setScenesCompleted] = useState(0);
   const currentScene = scenes.find(scene => scene.id === currentSceneId);
 
   useEffect(() => {
@@ -46,18 +47,24 @@ const ScenarioContainer = () => {
       {loading && <p>Loading...</p>}
       {
         (!loading && currentScene) &&
-        <Scenario
-          id={id}
-          currentScene={currentScene}
-          moveToScene={(sceneId) => setCurrentSceneId(sceneId)}
-        />
+        <div>
+          <p>Scenario: {id}</p>
+          <p>Progress {scenesCompleted}/{scenes.length}</p>
+          <Scene
+            id={id}
+            currentScene={currentScene}
+            moveToScene={(sceneId) => {
+              setScenesCompleted((v) => ++v);
+              setCurrentSceneId(sceneId)
+            }}
+          />
+        </div>
       }
     </div>
   );
 };
 
-function Scenario({
-  id,
+function Scene({
   currentScene,
   moveToScene
 }) {
@@ -79,7 +86,6 @@ function Scenario({
   }
 
   return <>
-    <p>Scenario: {id}</p>
     <p>{currentScene.narrative}</p>
     <ul className={styles.mcqChoices}>
       {currentScene.options.map((option, index) => (
@@ -95,4 +101,4 @@ function Scenario({
   </>
 }
 
-export default ScenarioContainer;
+export default Scenario;
