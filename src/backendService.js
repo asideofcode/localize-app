@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, getDoc, collection, query, getDocs, limit, startAfter, doc } from "firebase/firestore";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -15,9 +15,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Async function to fetch a document
-async function fetchDocument(path) {
-    const docRef = doc(db, ...path.split('/'));
+export async function fetchScenario(id) {
+    const docRef = doc(db, 'scenarios', id);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
         return docSnap.data();
@@ -26,6 +25,23 @@ async function fetchDocument(path) {
     }
 };
 
-export async function fetchScenario(id) {
-    return fetchDocument('scenarios/' + id);
+export async function fetchScenarios(pageSize = 10, startAfterDoc = null) {
+    const scenariosRef = collection(db, 'scenarios');
+    let q = query(scenariosRef, limit(pageSize));
+
+    // If startAfterDoc is provided, modify the query to start after that document
+    if (startAfterDoc) {
+        q = query(scenariosRef, startAfter(startAfterDoc), limit(pageSize));
+    }
+
+    const querySnapshot = await getDocs(q);
+    const scenarios = [];
+    let lastVisible = null;
+
+    querySnapshot.forEach((doc) => {
+        scenarios.push({ id: doc.id, ...doc.data() });
+        lastVisible = doc;
+    });
+
+    return { scenarios, lastVisible };
 };
