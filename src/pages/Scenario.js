@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './Scenario.module.css';
-import { fetchScenario } from '../backendService';
+import { fetchScenario, createUser, getPlayerFromFirebase, currentPlayer } from '../backendService';
 // import exampleScenario from './scenario.json';
 
 const ScenarioContainer = () => {
@@ -68,11 +68,23 @@ function Scenario({
   };
 
   const handleCheckClick = () => {
+
+    //---------------For testing-----------------------
+    //createUser("example@example.com","123456"); //Working!
+    const playerPromise = getPlayerFromFirebase("example@example.com").then((playerPromise) => {
+      console.log(playerPromise); 
+    }
+    );
+    //-------------------------------------------------
+
     if (!clickedOption) return;
 
     setLastFeedback(clickedOption.feedback);
 
     if (!currentScene.mustBeCorrect || (currentScene.mustBeCorrect && clickedOption.isCorrect)) {
+      //Place appropriate xp and/or monetary rewards here by calling currentPlayer's methods.
+      currentPlayer.increaseMoney(10);
+
       moveToScene(clickedOption.nextScene);
       setClickedOption(undefined);
     }
