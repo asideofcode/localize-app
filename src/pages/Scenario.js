@@ -108,7 +108,8 @@ function Scene({
   currentScene,
   moveToScene
 }) {
-  const [lastFeedback, setLastFeedback] = useState('');
+  const [goodFeedback, setGoodFeedback] = useState('');
+  const [badFeedback, setBadFeedback] = useState('');
   const [clickedOption, setClickedOption] = useState(undefined);
   const handleOptionClick = (option) => {
     setClickedOption(option);
@@ -117,16 +118,20 @@ function Scene({
   const handleCheckClick = () => {
     if (!clickedOption) return;
 
-    setLastFeedback(clickedOption.feedback);
-
     if (!currentScene.mustBeCorrect || (currentScene.mustBeCorrect && clickedOption.isCorrect)) {
+      setGoodFeedback(clickedOption.feedback);
+      setBadFeedback("");
       moveToScene(clickedOption.nextScene);
       setClickedOption(undefined);
+    } else {
+      setBadFeedback(clickedOption.feedback);
     }
   }
 
   return <>
+    {goodFeedback && <p>✅ {goodFeedback}</p>}
     <p>{currentScene.narrative}</p>
+    
     <ul className={styles.mcqChoices}>
       {currentScene.options.map((option, index) => (
         <li key={index}>
@@ -137,7 +142,7 @@ function Scene({
       ))}
     </ul>
     {currentScene.options.length > 0 && <button disabled={!clickedOption} className={styles.mcqCheck} onClick={handleCheckClick}>Check</button>}
-    {lastFeedback && <p>{lastFeedback}</p>}
+    {badFeedback && <p>❌ {badFeedback}</p>}
   </>
 }
 
