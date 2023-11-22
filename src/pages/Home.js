@@ -3,10 +3,6 @@ import { Link } from 'react-router-dom';
 import styles from './Home.module.css';
 import { fetchScenarios } from '../backendService';
 
-const scenarios = [
-  { id: "7G5jd0H02t1Y9fS2xfTd", title: 'Visiting Bath City Centre' },
-];
-
 const ScenarioList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,19 +34,22 @@ const ScenarioList = () => {
       <h1 className={styles.title}>Select a Scenario</h1>
       {error && <p>{error}</p>}
       {
-        loading ? <p>Loading...</p> :
-          <ul className={styles.list}>
-            {scenarios.length == 0 && <p>We're all out of scenarios :(</p>}
-            {scenarios.map((scenario) => (
+        loading ?
+          (<p>Loading...</p>) :
+          (
+            <ul className={styles.list}>
+              {scenarios.length == 0 && <p>We're all out of scenarios :(</p>}
+              {scenarios.map((scenario) => (
 
-              <Link key={scenario.id} to={`/scenario/${scenario.id}`} className={styles.link}>
-                <li className={styles.listItem}>
-                  {scenario.title}
-                </li>
-              </Link>
+                <Link key={scenario.id} to={`/scenario/${scenario.id}`} className={styles.link}>
+                  <li className={styles.listItem}>
+                    {scenario.title}
+                  </li>
+                </Link>
 
-            ))}
-          </ul>
+              ))}
+            </ul>
+          )
       }
     </div >
   );
