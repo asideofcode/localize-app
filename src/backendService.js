@@ -1,5 +1,9 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, getDoc, collection, query, getDocs, limit, startAfter, doc } from "firebase/firestore";
+import localService from "./localService"
+
+// A toggle to switch between local and remote service
+const useLocalService = process.env.REACT_APP_USE_LOCAL_SERVICE === 'true';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -45,3 +49,9 @@ export async function fetchScenarios(pageSize = 10, startAfterDoc = null) {
 
     return { scenarios, lastVisible };
 };
+
+if (useLocalService) {
+    fetchScenario = localService.fetchScenario;
+    fetchScenarios = localService.fetchScenarios;
+}
+

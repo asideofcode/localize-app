@@ -17,6 +17,14 @@ function determineSceneDistances(scenes, initialStateId) {
       distances[id] = distance;
       const scene = scenes.find(scene => scene.id === id);
       scene.options.forEach(option => {
+        if (option.nextScene == scene.id) throw new Error(`Scene ${id} has an option that loops back to the same scene`);
+
+        if (
+          (!scene.mustBeCorrect && !option.nextScene)
+          ||
+          (scene.mustBeCorrect && option.isCorrect && !option.nextScene)
+        ) throw new Error(`Scene ${id} has an option without a next scene`);
+
         if (!scene.mustBeCorrect || scene.mustBeCorrect && option.isCorrect) {
           queue.push({ id: option.nextScene, distance: distance + 1 });
         }
@@ -68,10 +76,9 @@ const Scenario = () => {
           scenes: data.scenes
         });
         setCurrentSceneId(data.initialStateId)
-        setLoading(false);
       })
-      .catch(err => {
-        setError(err);
+      .finally(() => {
+        // setError(err);
         setLoading(false);
       });
 
@@ -131,7 +138,7 @@ function Scene({
   return <>
     {goodFeedback && <p>✅ {goodFeedback}</p>}
     <p>{currentScene.narrative}</p>
-    
+
     <ul className={styles.mcqChoices}>
       {currentScene.options.map((option, index) => (
         <li key={index}>
