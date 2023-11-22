@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './Scenario.module.css';
-import { fetchScenario } from '../backendService';
+import { fetchScenario, createUser, getPlayerFromFirebase, currentPlayer } from '../backendService';
 // import exampleScenario from './scenario.json';
 
 // Determines distances from the initial scene to all other scenes
@@ -116,11 +116,24 @@ function Scene({
   };
 
   const handleCheckClick = () => {
+
+    //---------------For testing-----------------------
+    //createUser("example@example.com","123456"); //Working!
+    const playerPromise = getPlayerFromFirebase("example@example.com").then((playerPromise) => {
+      console.log(playerPromise); 
+    }
+    );
+    //-------------------------------------------------
+
     if (!clickedOption) return;
 
     if (!currentScene.mustBeCorrect || (currentScene.mustBeCorrect && clickedOption.isCorrect)) {
+
       setGoodFeedback(clickedOption.feedback);
+      //Place appropriate xp and/or monetary rewards here by calling currentPlayer's methods.
+      currentPlayer.increaseMoney(10);
       setBadFeedback("");
+
       moveToScene(clickedOption.nextScene);
       setClickedOption(undefined);
     } else {
