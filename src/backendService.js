@@ -1,7 +1,8 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { getFirestore, getDoc, collection, query, getDocs, limit, startAfter, doc, setDoc, updateDoc } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { Player } from './Player';
+
 
 // Firebase configuration
 const firebaseConfig = {
@@ -17,11 +18,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-export var currentPlayer = new Player("", "");
-
-// Async function to fetch a document
-async function fetchDocument(path) {
-    const docRef = doc(db, ...path.split('/'));
+export async function fetchScenario(id) {
+    const docRef = doc(db, 'scenarios', id);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
         return docSnap.data();
@@ -29,9 +27,27 @@ async function fetchDocument(path) {
         return null;
     }
 };
+export var currentPlayer = new Player("", "");
+  
+export async function fetchScenarios(pageSize = 10, startAfterDoc = null) {
+    const scenariosRef = collection(db, 'scenarios');
+    let q = query(scenariosRef, limit(pageSize));
 
-export async function fetchScenario(id) {
-    return fetchDocument('scenarios/' + id);
+    // If startAfterDoc is provided, modify the query to start after that document
+    if (startAfterDoc) {
+        q = query(scenariosRef, startAfter(startAfterDoc), limit(pageSize));
+    }
+
+    const querySnapshot = await getDocs(q);
+    const scenarios = [];
+    let lastVisible = null;
+
+    querySnapshot.forEach((doc) => {
+        scenarios.push({ id: doc.id, ...doc.data() });
+        lastVisible = doc;
+    });
+
+    return { scenarios, lastVisible };
 };
 
 export async function updateUserData(email, field, value) {

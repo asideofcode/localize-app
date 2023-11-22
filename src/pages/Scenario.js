@@ -4,15 +4,43 @@ import styles from './Scenario.module.css';
 import { fetchScenario, createUser, getPlayerFromFirebase, currentPlayer } from '../backendService';
 // import exampleScenario from './scenario.json';
 
-const ScenarioContainer = () => {
+// Determines distances from the initial scene to all other scenes
+// This is used to determine the progress of the user
+// and relies on all scenarios having a single initial scene and a single ending scene
+function determineSceneDistances(scenes, initialStateId) {
+  let distances = {};
+  let queue = [{ id: initialStateId, distance: 0 }];
+
+  while (queue.length > 0) {
+    let { id, distance } = queue.shift();
+    if (distances[id] === undefined || distance > distances[id]) {
+      distances[id] = distance;
+      const scene = scenes.find(scene => scene.id === id);
+      scene.options.forEach(option => {
+        if (!scene.mustBeCorrect || scene.mustBeCorrect && option.isCorrect) {
+          queue.push({ id: option.nextScene, distance: distance + 1 });
+        }
+      });
+    }
+  }
+
+  return [distances, Math.max(...Object.values(distances))];
+}
+
+const Scenario = () => {
   let { id } = useParams();
   let navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentSceneId, setCurrentSceneId] = useState(undefined);
-  const [scenes, setScenes] = useState([]);
+  const [data, setData] = useState({});
+  const [scenesCompleted, setScenesCompleted] = useState(0);
+  const scenes = data.scenes || [];
   const currentScene = scenes.find(scene => scene.id === currentSceneId);
+
+  const distance = data.distances ? data.distances[currentSceneId] : -1;
+  const maxDistance = data.maxDistance || -1;
 
   useEffect(() => {
     setLoading(true);
@@ -25,7 +53,20 @@ const ScenarioContainer = () => {
           return;
         }
 
-        setScenes(data.scenes);
+        const [distances, maxDistance] = determineSceneDistances(data.scenes, data.initialStateId);
+
+        // Randomize the order of the options
+        data.scenes.forEach(scene => {
+          if (scene.options) {
+            scene.options.sort(() => Math.random() - 0.5);
+          }
+        });
+
+        setData({
+          distances,
+          maxDistance,
+          scenes: data.scenes
+        });
         setCurrentSceneId(data.initialStateId)
         setLoading(false);
       })
@@ -42,26 +83,33 @@ const ScenarioContainer = () => {
         x
       </button>
 
-      {error}
+      {error && error.toString()}
       {loading && <p>Loading...</p>}
       {
         (!loading && currentScene) &&
-        <Scenario
-          id={id}
-          currentScene={currentScene}
-          moveToScene={(sceneId) => setCurrentSceneId(sceneId)}
-        />
+        <div>
+          <p>Scenario: {id}</p>
+          <p>Progress {distance}/{maxDistance}</p>
+          <Scene
+            id={id}
+            currentScene={currentScene}
+            moveToScene={(sceneId) => {
+              setScenesCompleted((v) => ++v);
+              setCurrentSceneId(sceneId)
+            }}
+          />
+        </div>
       }
     </div>
   );
 };
 
-function Scenario({
-  id,
+function Scene({
   currentScene,
   moveToScene
 }) {
-  const [lastFeedback, setLastFeedback] = useState('');
+  const [goodFeedback, setGoodFeedback] = useState('');
+  const [badFeedback, setBadFeedback] = useState('');
   const [clickedOption, setClickedOption] = useState(undefined);
   const handleOptionClick = (option) => {
     setClickedOption(option);
@@ -79,20 +127,24 @@ function Scenario({
 
     if (!clickedOption) return;
 
-    setLastFeedback(clickedOption.feedback);
-
     if (!currentScene.mustBeCorrect || (currentScene.mustBeCorrect && clickedOption.isCorrect)) {
+
+      setGoodFeedback(clickedOption.feedback);
       //Place appropriate xp and/or monetary rewards here by calling currentPlayer's methods.
       currentPlayer.increaseMoney(10);
+      setBadFeedback("");
 
       moveToScene(clickedOption.nextScene);
       setClickedOption(undefined);
+    } else {
+      setBadFeedback(clickedOption.feedback);
     }
   }
 
   return <>
-    <p>Scenario: {id}</p>
+    {goodFeedback && <p>✅ {goodFeedback}</p>}
     <p>{currentScene.narrative}</p>
+    
     <ul className={styles.mcqChoices}>
       {currentScene.options.map((option, index) => (
         <li key={index}>
@@ -102,9 +154,9 @@ function Scenario({
         </li>
       ))}
     </ul>
-    <button disabled={!clickedOption} className={styles.mcqCheck} onClick={handleCheckClick}>Check</button>
-    {lastFeedback && <p>{lastFeedback}</p>}
+    {currentScene.options.length > 0 && <button disabled={!clickedOption} className={styles.mcqCheck} onClick={handleCheckClick}>Check</button>}
+    {badFeedback && <p>❌ {badFeedback}</p>}
   </>
 }
 
-export default ScenarioContainer;
+export default Scenario;
