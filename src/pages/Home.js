@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Home.module.css';
-import { fetchScenarios } from '../backendService';
+import { fetchScenarios, logIn } from '../backendService';
 
 const ScenarioList = () => {
   const [loading, setLoading] = useState(true);
@@ -10,6 +10,11 @@ const ScenarioList = () => {
 
   useEffect(() => {
     setLoading(true);
+
+    //Use this function to log a player in right at the start of the game.
+    if (!logIn("example@example.com", "123456")) {
+      //Or use prompt user to create an account if this fails
+    };
 
     fetchScenarios()
       .then(data => {

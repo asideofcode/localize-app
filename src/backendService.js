@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, getDoc, collection, query, getDocs, limit, startAfter, doc, setDoc, updateDoc } from "firebase/firestore";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { Player } from './Player';
 
 
@@ -92,6 +92,33 @@ async function addPlayerToFirestore(player) {
     }).then(
         console.log("Successfully added player to firestore")
     );
+}
+
+export async function logIn(email = "", password = "") {
+    const auth = getAuth();
+    signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+        //Signed in
+        console.log("user " + email + " signed in successfully");
+        getPlayerFromFirebase(email);
+        return true;
+    })
+    .catch((e) => {
+        //Login failed
+        console.log("Log in failed: " + e);
+        return false;
+    });
+}
+
+export async function logOut() {
+    const auth = getAuth();
+    signOut(auth).then(() => {
+        //Signed out
+        currentPlayer = new Player("", "");
+        console.log("Signed out successfully");
+    }).catch((e) => {
+        console.log("Error signing out: " + e)
+    });
 }
 
 export async function getPlayerFromFirebase(email) {
