@@ -19,11 +19,13 @@ function determineSceneDistances(scenes, initialStateId) {
     if (distances[id] === undefined || distance > distances[id]) {
       distances[id] = distance;
       const scene = scenes.find(scene => scene.id === id);
-      scene.options.forEach(option => {
-        if (!scene.mustBeCorrect || scene.mustBeCorrect && option.isCorrect) {
-          queue.push({ id: option.nextScene, distance: distance + 1 });
-        }
-      });
+      if (scene) {
+        scene.options.forEach(option => {
+          if (!scene.mustBeCorrect || scene.mustBeCorrect && option.isCorrect) {
+            queue.push({ id: option.nextScene, distance: distance + 1 });
+          }
+        })
+      };
     }
   }
 
@@ -59,6 +61,7 @@ const Scenario = () => {
           return;
         }
 
+        console.log(data);
         const [distances, maxDistance] = determineSceneDistances(data.scenes, data.initialStateId);
 
         // Randomize the order of the options
@@ -78,6 +81,8 @@ const Scenario = () => {
         setLearningText(data.learning_text);
       })
       .catch(err => {
+        console.log(err);
+        window.err = err;
         setError(err);
         setLoading(false);
       });
