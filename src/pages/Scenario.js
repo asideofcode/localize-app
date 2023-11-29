@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './Scenario.module.css';
 import { fetchScenario, createUser, getPlayerFromFirebase, currentPlayer } from '../backendService';
+import character from '../character.svg';
+import diamond from '../diamond.svg';
+import { useLocalStorage } from "@uidotdev/usehooks";
 // import exampleScenario from './scenario.json';
 
 // Determines distances from the initial scene to all other scenes
@@ -35,7 +38,9 @@ const Scenario = () => {
   const [error, setError] = useState(null);
   const [currentSceneId, setCurrentSceneId] = useState(undefined);
   const [data, setData] = useState({});
-  const [scenesCompleted, setScenesCompleted] = useState(0);
+  // const [points, setPoints] = useState(0);
+  const [points, setPoints] = useLocalStorage("experience-points", 0);
+
   const scenes = data.scenes || [];
   const currentScene = scenes.find(scene => scene.id === currentSceneId);
   const [learningText, setLearningText] = useState("") || "No learning text found";
@@ -81,34 +86,51 @@ const Scenario = () => {
 
   return (
     <div className={styles.container}>
-      <button onClick={() => navigate('/')} className={styles.exitButton}>
-        x
-      </button>
-
-      {error && error.toString()}
-      {loading && <p>Loading...</p>}
-      {
-        (!loading && currentScene) &&
-        <div>
-          <p>Scenario: {id}</p>
-          <p>Progress {distance}/{maxDistance}</p>
-          <Scene
-            id={id}
-            currentScene={currentScene}
-            moveToScene={(sceneId) => {
-              setScenesCompleted((v) => ++v);
-              setCurrentSceneId(sceneId)
-            }}
-          />
+      <div className={styles.header}>
+        <div className={styles.progress}>
+          <div className={styles.progressBar} >
+            <div className={styles.progressBarInner} style={{ width: `${distance / maxDistance * 100}%` }}></div>
+          </div>
+          <div className={styles.progressText}>{distance} / {maxDistance}</div>
         </div>
-      }
+
+        <div className={styles.points}>
+          <img src={diamond} className={styles.pointsIcon} alt="diamond" />{points}
+        </div>
+
+      </div>
+      <div className={styles.card}>
+        <button onClick={() => navigate('/')} className={styles.exitButton}>
+          x
+        </button>
+        {error && error.toString()}
+        {loading && <p>Loading...</p>}
+        {
+          (!loading && currentScene) &&
+          <div>
+            <p>Scenario: {id}</p>
+            <Scene
+              id={id}
+              currentScene={currentScene}
+              correctAnswer={(clickedOption) => {
+                setPoints(points + 10);
+                setCurrentSceneId(clickedOption.nextScene)
+              }}
+              wrongAnswer={() => {
+                setPoints(points - 2);
+              }}
+            />
+          </div>
+        }
+      </div>
     </div>
   );
 };
 
 function Scene({
   currentScene,
-  moveToScene
+  correctAnswer,
+  wrongAnswer
 }) {
   const [goodFeedback, setGoodFeedback] = useState('');
   const [badFeedback, setBadFeedback] = useState('');
@@ -121,10 +143,10 @@ function Scene({
 
     //---------------For testing-----------------------
     //createUser("example@example.com","123456"); //Working!
-    const playerPromise = getPlayerFromFirebase("example@example.com").then((playerPromise) => {
-      console.log(playerPromise); 
-    }
-    );
+    // const playerPromise = getPlayerFromFirebase("example@example.com").then((playerPromise) => {
+    //   console.log(playerPromise); 
+    // }
+    // );
     //-------------------------------------------------
 
     if (!clickedOption) return;
@@ -133,20 +155,34 @@ function Scene({
 
       setGoodFeedback(clickedOption.feedback);
       //Place appropriate xp and/or monetary rewards here by calling currentPlayer's methods.
-      currentPlayer.increaseMoney(10);
       setBadFeedback("");
 
-      moveToScene(clickedOption.nextScene);
+      correctAnswer(clickedOption);
       setClickedOption(undefined);
     } else {
+      wrongAnswer(clickedOption);
       setBadFeedback(clickedOption.feedback);
     }
   }
 
+  if (goodFeedback) {
+    return <>
+      <div>
+        <img src={character} className={styles.character} alt="character" />
+        <p class={[styles.speech].join(" ")}>{goodFeedback}</p>
+      </div>
+
+      {currentScene.options.length > 0 && <button className={styles.mcqCheck} onClick={() => setGoodFeedback(null)}>Next</button>}
+    </>
+  }
+
   return <>
     {goodFeedback && <p>✅ {goodFeedback}</p>}
-    <p>{currentScene.narrative}</p>
-    
+    <div>
+      <img src={character} className={styles.character} alt="character" />
+      <p class={[styles.speech].join(" ")}>{currentScene.narrative}</p>
+    </div>
+
     <ul className={styles.mcqChoices}>
       {currentScene.options.map((option, index) => (
         <li key={index}>

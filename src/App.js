@@ -41,8 +41,8 @@ const App = () => {
         <Route path="/" element={<SplashScreen />} />
         <Route path="/scenarios" element={<ScenarioList />} />
         <Route path="/scenario/:id" element={<Scenario />} />
-        <Route path="/scenario/3" element={<CoffeeOrderScenario />} />
-        <Route path="/scenario/2" element={<DialogScenario />} />
+        {/* <Route path="/scenario/3" element={<CoffeeOrderScenario />} /> */}
+        {/* <Route path="/scenario/2" element={<DialogScenario />} /> */}
       </Routes>
     </Router>
   );
