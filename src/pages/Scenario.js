@@ -38,6 +38,7 @@ const Scenario = () => {
   const [scenesCompleted, setScenesCompleted] = useState(0);
   const scenes = data.scenes || [];
   const currentScene = scenes.find(scene => scene.id === currentSceneId);
+  const [learningText, setLearningText] = useState("") || "No learning text found";
 
   const distance = data.distances ? data.distances[currentSceneId] : -1;
   const maxDistance = data.maxDistance || -1;
@@ -65,10 +66,11 @@ const Scenario = () => {
         setData({
           distances,
           maxDistance,
-          scenes: data.scenes
+          scenes: data.scenes,
         });
         setCurrentSceneId(data.initialStateId)
         setLoading(false);
+        setLearningText(data.learning_text);
       })
       .catch(err => {
         setError(err);
