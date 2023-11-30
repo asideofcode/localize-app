@@ -13,20 +13,22 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 // and relies on all scenarios having a single initial scene and a single ending scene
 function determineSceneDistances(scenes, initialStateId) {
   let distances = {};
-  let queue = [{ id: initialStateId, distance: 0 }];
+  let queue = [{ id: initialStateId, distance: 0, visited: new Set([initialStateId]) }];
 
   while (queue.length > 0) {
-    let { id, distance } = queue.shift();
-    if (distances[id] === undefined || distance > distances[id]) {
-      distances[id] = distance;
-      const scene = scenes.find(scene => scene.id === id);
-      if (scene) {
-        scene.options.forEach(option => {
-          if (!scene.mustBeCorrect || scene.mustBeCorrect && option.isCorrect) {
-            queue.push({ id: option.nextScene, distance: distance + 1 });
-          }
-        })
-      };
+    let { id, distance, visited } = queue.shift();
+
+    distances[id] = Math.max(distances[id] || 0, distance);
+
+    const scene = scenes.find(scene => scene.id === id);
+    if (scene) {
+      scene.options.forEach(option => {
+        if ((!scene.mustBeCorrect || (scene.mustBeCorrect && option.isCorrect)) && !visited.has(option.nextScene)) {
+          let newVisited = new Set(visited);
+          newVisited.add(option.nextScene);
+          queue.push({ id: option.nextScene, distance: distance + 1, visited: newVisited });
+        }
+      });
     }
   }
 
@@ -96,7 +98,7 @@ const Scenario = () => {
         // Preload images
         slides.forEach((slide) => {
           const img = new Image();
-          img.src = slide.image;
+          img.src = slide.imageUrl;
         });
         setData({
           distances,
