@@ -1,6 +1,5 @@
 /* Scenario.module.css */
 .container {
-  
 }
 
 .card {
@@ -29,7 +28,7 @@
 
 .mcqChoice {
   display: block;
-  width:  100%;;
+  width: 100%;
   padding: 10px 20px;
   background-color: #fff;
   border: 1px solid #ddd;
@@ -38,7 +37,8 @@
   margin-bottom: 10px;
 }
 
-.mcqChoice.active, .mcqChoice:hover.active {
+.mcqChoice.active,
+.mcqChoice:hover.active {
   background-color: #ddf4ff;
 }
 
@@ -53,7 +53,7 @@ ul.mcqChoices {
   max-width: 500px;
 }
 
-.mcqCheck {
+.ctaButton {
   display: block;
   padding: 10px 20px;
   background-color: #58cc02;
@@ -64,23 +64,32 @@ ul.mcqChoices {
   color: #fff;
 }
 
-.mcqCheck:hover {
+.ctaButton:hover {
   background-color: #61e001;
+}
+
+.ctaButton.challenge {
+  background-color: #d9782e;
+  border: 1px solid #d9782e;
+}
+.ctaButton.challenge:hover {
+  background-color: #e88030;
 }
 
 .character {
   width: 100px;
 }
 
-blockquote.bubble { 
-	background-position: center;
+
+blockquote.bubble {
+  background-position: center;
   background-repeat: no-repeat !important;
-	background-size: 100% 100%;
+  background-size: 100% 100%;
   margin: 0 auto;
-	text-align: center;
-	height: 0;
-	box-sizing: content-box;
-	line-height: 1;
+  text-align: center;
+  height: 0;
+  box-sizing: content-box;
+  line-height: 1;
 }
 .speech {
   position: relative;
@@ -90,20 +99,26 @@ blockquote.bubble {
   padding: 20px;
   color: white;
 }
+.speech.challenge {
+  background: rgb(183 137 102);
+}
+.speech.challenge:after {
+  border-bottom-color: rgb(183 137 102);
+}
 
 .speech:after {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 25%;
-	width: 0;
-	height: 0;
-	border: 20px solid transparent;
-	border-bottom-color: #00aabb;
-	border-top: 0;
-	border-left: 0;
-	margin-left: -10px;
-	margin-top: -20px;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 25%;
+  width: 0;
+  height: 0;
+  border: 20px solid transparent;
+  border-bottom-color: #00aabb;
+  border-top: 0;
+  border-left: 0;
+  margin-left: -10px;
+  margin-top: -20px;
 }
 
 .header {
@@ -151,3 +166,20 @@ blockquote.bubble {
   width: 20px;
   height: 20px;
 }
+
+.slideButtonContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.slideImage {
+  max-width: 500px;
+  margin-bottom: 20px;
+}
+
+.loading {
+  width: 500px;
+  height: 500px;
+}
+
+

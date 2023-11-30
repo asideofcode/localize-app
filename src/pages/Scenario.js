@@ -5,6 +5,7 @@ import { fetchScenario, createUser, getPlayerFromFirebase, currentPlayer } from 
 import character from '../character.svg';
 import diamond from '../diamond.svg';
 import { useLocalStorage } from "@uidotdev/usehooks";
+
 // import exampleScenario from './scenario.json';
 
 // Determines distances from the initial scene to all other scenes
@@ -32,6 +33,12 @@ function determineSceneDistances(scenes, initialStateId) {
   return [distances, Math.max(...Object.values(distances))];
 }
 
+const sections = {
+  SLIDES: 'slides',
+  MCQ: 'mcq',
+  COMPLETE: 'complete'
+};
+
 const Scenario = () => {
   let { id } = useParams();
   let navigate = useNavigate();
@@ -40,12 +47,13 @@ const Scenario = () => {
   const [error, setError] = useState(null);
   const [currentSceneId, setCurrentSceneId] = useState(undefined);
   const [data, setData] = useState({});
+  const [section, setSection] = useState(sections.SLIDES);
+
   // const [points, setPoints] = useState(0);
   const [points, setPoints] = useLocalStorage("experience-points", 0);
 
   const scenes = data.scenes || [];
   const currentScene = scenes.find(scene => scene.id === currentSceneId);
-  const [learningText, setLearningText] = useState("") || "No learning text found";
 
   const distance = data.distances ? data.distances[currentSceneId] : -1;
   const maxDistance = data.maxDistance || -1;
@@ -61,7 +69,6 @@ const Scenario = () => {
           return;
         }
 
-        console.log(data);
         const [distances, maxDistance] = determineSceneDistances(data.scenes, data.initialStateId);
 
         // Randomize the order of the options
@@ -71,14 +78,35 @@ const Scenario = () => {
           }
         });
 
+        const slides = [
+          {
+            imageUrl: "https://static.vecteezy.com/system/resources/previews/027/148/565/non_2x/yellow-city-bus-passenger-transport-side-view-public-transport-modern-touristic-bus-illustration-vector.jpg",
+            text: `Taking a bus to school is a good way to save money. But you need to know how to use the bus.`
+          },
+          {
+            imageUrl: "https://thumbs.dreamstime.com/z/terminal-passenger-transport-card-hand-airport-metro-bus-subway-ticket-validator-wireless-contactless-cashless-payments-152800600.jpg?w=768",
+            text: "At Bath university, you can use the bus by showing your student card or tapping your phone."
+          },
+          {
+            imageUrl: "https://cdn.vectorstock.com/i/1000x1000/16/79/people-getting-off-bus-cartoon-isolated-vector-34071679.webp",
+            text: "Don't forget to tap your phone when you get off the bus."
+          }
+        ];
+
+        // Preload images
+        slides.forEach((slide) => {
+          const img = new Image();
+          img.src = slide.image;
+        });
         setData({
           distances,
           maxDistance,
           scenes: data.scenes,
+          slides: slides
         });
+
         setCurrentSceneId(data.initialStateId)
         setLoading(false);
-        setLearningText(data.learning_text);
       })
       .catch(err => {
         console.log(err);
@@ -109,33 +137,56 @@ const Scenario = () => {
           x
         </button>
         {error && error.toString()}
-        {loading && <p>Loading...</p>}
+        {loading && <div className={styles.loading}>Loading...</div>}
         {
           (!loading && currentScene) &&
           <div>
-            <p>Scenario: {id}</p>
-            <Scene
-              id={id}
-              currentScene={currentScene}
-              correctAnswer={(clickedOption) => {
-                setPoints(points + 10);
-                setCurrentSceneId(clickedOption.nextScene)
-              }}
-              wrongAnswer={() => {
-                setPoints(points - 2);
-              }}
-            />
+            {
+              section == sections.SLIDES &&
+              <Slides
+                id={id}
+                slides={data.slides}
+                switchToQuestions={() => {
+                  setSection(sections.MCQ);
+                }}
+              />
+            }
+            {
+              section == sections.MCQ &&
+              <Scene
+                id={id}
+                currentScene={currentScene}
+                correctAnswer={(clickedOption) => {
+                  setPoints(points + 10);
+                  setCurrentSceneId(clickedOption.nextScene)
+                }}
+                wrongAnswer={() => {
+                  setPoints(points - 2);
+                }}
+                onComplete={() => {
+                  setSection(sections.COMPLETE);
+                }}
+              />
+            }
+            {
+              section == sections.COMPLETE && (
+                <div>
+                  <h2>Well done!</h2>
+                </div>)
+            }
+
           </div>
         }
       </div>
-    </div>
+    </div >
   );
 };
 
 function Scene({
   currentScene,
   correctAnswer,
-  wrongAnswer
+  wrongAnswer,
+  onComplete
 }) {
   const [goodFeedback, setGoodFeedback] = useState('');
   const [badFeedback, setBadFeedback] = useState('');
@@ -143,6 +194,8 @@ function Scene({
   const handleOptionClick = (option) => {
     setClickedOption(option);
   };
+
+  const endOfScene = !currentScene.options?.length;
 
   const handleCheckClick = () => {
 
@@ -174,18 +227,21 @@ function Scene({
     return <>
       <div>
         <img src={character} className={styles.character} alt="character" />
-        <p class={[styles.speech].join(" ")}>{goodFeedback}</p>
+        <p className={[styles.speech].join(" ")}>{goodFeedback}</p>
       </div>
 
-      {currentScene.options.length > 0 && <button className={styles.mcqCheck} onClick={() => setGoodFeedback(null)}>Next</button>}
+      {!endOfScene && <button className={styles.ctaButton} onClick={() => setGoodFeedback(null)}>Next</button>}
+      {endOfScene && <button className={styles.ctaButton} onClick={onComplete}>Finish</button>}
+
     </>
   }
 
   return <>
+    <h2>Question time!</h2>
     {goodFeedback && <p>✅ {goodFeedback}</p>}
     <div>
       <img src={character} className={styles.character} alt="character" />
-      <p class={[styles.speech].join(" ")}>{currentScene.narrative}</p>
+      <p className={[styles.speech].join(" ")}>{currentScene.narrative}</p>
     </div>
 
     <ul className={styles.mcqChoices}>
@@ -197,9 +253,54 @@ function Scene({
         </li>
       ))}
     </ul>
-    {currentScene.options.length > 0 && <button disabled={!clickedOption} className={styles.mcqCheck} onClick={handleCheckClick}>Check</button>}
+    {!endOfScene && <button disabled={!clickedOption} className={styles.ctaButton} onClick={handleCheckClick}>Check</button>}
+    {endOfScene && <button className={styles.ctaButton} onClick={onComplete}>Finish</button>}
+
     {badFeedback && <p>❌ {badFeedback}</p>}
   </>
+}
+
+const Slides = (props) => {
+  const slides = props.slides;
+  const [slideIndex, setSlideIndex] = useState(0);
+
+  const isAfterLastSlide = slideIndex > slides.length - 1;
+  const isFirstSlide = slideIndex === 0;
+
+  const slide = slides[slideIndex];
+
+  const onNextSlide = () => {
+    setSlideIndex(Math.min(slideIndex + 1, slides.length));
+  }
+  const onPreviousSlide = () => {
+    setSlideIndex(Math.max(slideIndex - 1, 0));
+  }
+
+  if (isAfterLastSlide) {
+    return (
+      <div>
+        <h2>Question time!</h2>
+        <img src={character} className={styles.character} alt="character" />
+        <p className={[styles.speech, styles.challenge].join(" ")}>If you're ready for an adventure with <b>question time</b> then jump in!</p>
+        <div className={styles.slideButtonContainer}>
+          <button className={[styles.ctaButton, styles.challenge].join(" ")} onClick={onPreviousSlide}>Back</button>
+          <button className={[styles.ctaButton, styles.challenge].join(" ")} onClick={() => props.switchToQuestions()}>Go!</button>
+        </div>
+      </div>
+    )
+  }
+
+
+
+  return <div>
+    <h2>Time to learn!</h2>
+    {slide.imageUrl && <img src={slide.imageUrl} className={styles.slideImage} alt="slide image" />}
+    <p>{slide.text}</p>
+    <div className={styles.slideButtonContainer}>
+      {!isFirstSlide && <button className={[styles.ctaButton, styles.challenge].join(" ")} onClick={onPreviousSlide}>Back</button>}
+      <button className={[styles.ctaButton, styles.challenge].join(" ")} onClick={onNextSlide}>Next</button>
+    </div>
+  </div>;
 }
 
 export default Scenario;
