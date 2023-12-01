@@ -55,17 +55,4 @@ const ScenarioList = () => {
   );
 };
 
-
-const Home = () => {
-  return (
-    <>
-      <h1>localize</h1>
-      <p>an interactive, web-based platform designed to help international students familiarize themselves with their new host countries.</p>
-      <div>
-        <ScenarioList />
-      </div>
-    </>
-  );
-};
-
-export default Home;
+export default ScenarioList;
