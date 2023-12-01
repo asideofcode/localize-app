@@ -80,20 +80,21 @@ const Scenario = () => {
           }
         });
 
-        const slides = [
-          {
-            imageUrl: "https://static.vecteezy.com/system/resources/previews/027/148/565/non_2x/yellow-city-bus-passenger-transport-side-view-public-transport-modern-touristic-bus-illustration-vector.jpg",
-            text: `Taking a bus to school is a good way to save money. But you need to know how to use the bus.`
-          },
-          {
-            imageUrl: "https://thumbs.dreamstime.com/z/terminal-passenger-transport-card-hand-airport-metro-bus-subway-ticket-validator-wireless-contactless-cashless-payments-152800600.jpg?w=768",
-            text: "At Bath university, you can use the bus by showing your student card or tapping your phone."
-          },
-          {
-            imageUrl: "https://cdn.vectorstock.com/i/1000x1000/16/79/people-getting-off-bus-cartoon-isolated-vector-34071679.webp",
-            text: "Don't forget to tap your phone when you get off the bus."
-          }
-        ];
+        // const slides = [
+        //   {
+        //     imageUrl: "https://static.vecteezy.com/system/resources/previews/027/148/565/non_2x/yellow-city-bus-passenger-transport-side-view-public-transport-modern-touristic-bus-illustration-vector.jpg",
+        //     text: `Taking a bus to school is a good way to save money. But you need to know how to use the bus.`
+        //   },
+        //   {
+        //     imageUrl: "https://thumbs.dreamstime.com/z/terminal-passenger-transport-card-hand-airport-metro-bus-subway-ticket-validator-wireless-contactless-cashless-payments-152800600.jpg?w=768",
+        //     text: "At Bath university, you can use the bus by showing your student card or tapping your phone."
+        //   },
+        //   {
+        //     imageUrl: "https://cdn.vectorstock.com/i/1000x1000/16/79/people-getting-off-bus-cartoon-isolated-vector-34071679.webp",
+        //     text: "Don't forget to tap your phone when you get off the bus."
+        //   }
+        // ];
+        const slides = data.learning_slides || [];
 
         // Preload images
         slides.forEach((slide) => {
