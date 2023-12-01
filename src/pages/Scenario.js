@@ -99,7 +99,7 @@ const Scenario = () => {
         // Preload images
         slides.forEach((slide) => {
           const img = new Image();
-          img.src = slide.imageUrl;
+          img.src = slide.imageURL;
         });
         setData({
           distances,
@@ -297,7 +297,7 @@ const Slides = (props) => {
 
   return <div>
     <h2>Time to learn!</h2>
-    {slide.imageUrl && <img src={slide.imageUrl} className={styles.slideImage} alt="slide image" />}
+    {slide.imageURL && <img src={slide.imageURL} className={styles.slideImage} alt="slide image" />}
     <p>{slide.text}</p>
     <div className={styles.slideButtonContainer}>
       {!isFirstSlide && <button className={[styles.ctaButton, styles.challenge].join(" ")} onClick={onPreviousSlide}>Back</button>}
