@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Home.module.css';
 import { fetchScenarios } from '../backendService';
+import { images } from '../AssetLibrary';
 
 const ScenarioList = () => {
   const [loading, setLoading] = useState(true);
@@ -55,14 +56,54 @@ const ScenarioList = () => {
   );
 };
 
+/*
+const SplashScreen = () => {
+    const [proceed, setProceed] = useState(false);
+    let navigate = useNavigate();
+
+  return (
+      <div className={styles.container}>
+          <h1>Welcome to Localise!</h1>
+          <div className={styles.selectionArea}>
+              <button
+                  className={styles.startButton}
+                  onClick={setProceed(true)}>
+                  Start
+              </button>
+          </div>
+      </div>
+  );
+};
+*/
+
 
 const Home = () => {
+
+  const [proceed, setProceed] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const handleStartPress = () => {
+    setVisible(false);
+    setProceed(true);
+  }
+
   return (
     <>
-      <h1>localize</h1>
-      <p>an interactive, web-based platform designed to help international students familiarize themselves with their new host countries.</p>
       <div>
-        <ScenarioList />
+        {visible &&
+        <div className={styles.container}>
+          <h1>Welcome to Localise!</h1>
+          <img 
+            src={images.SPLASHSCREEN}/>
+          <div className={styles.selectionArea}>
+            <button
+              className={styles.startButton}
+              onClick={handleStartPress}>
+              Start
+            </button>
+          </div>
+        </div>
+        }
+        {proceed && <ScenarioList />}
       </div>
     </>
   );
