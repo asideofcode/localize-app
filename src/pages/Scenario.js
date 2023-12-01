@@ -5,7 +5,10 @@ import { fetchScenario, createUser, getPlayerFromFirebase, currentPlayer } from 
 import character from '../character.svg';
 import diamond from '../diamond.svg';
 import { useLocalStorage } from "@uidotdev/usehooks";
+import useSound from 'use-sound';
 
+import correctSound from '../sounds/correct answer.mp3';
+import wrongSound from '../sounds/wrong answer.mp3';
 // import exampleScenario from './scenario.json';
 
 // Determines distances from the initial scene to all other scenes
@@ -44,6 +47,9 @@ const sections = {
 const Scenario = () => {
   let { id } = useParams();
   let navigate = useNavigate();
+
+  const [playCorrectSound, { stopCorrectSound }] = useSound(correctSound);
+  const [playWrongSound, { stopWrongSound }] = useSound(wrongSound);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -169,9 +175,11 @@ const Scenario = () => {
                 correctAnswer={(clickedOption) => {
                   setPoints(points + 10);
                   setCurrentSceneId(clickedOption.nextScene)
+                  playCorrectSound();
                 }}
                 wrongAnswer={() => {
                   setPoints(points - 2);
+                  playWrongSound();
                 }}
                 onComplete={() => {
                   setSection(sections.COMPLETE);
