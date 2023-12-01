@@ -26,11 +26,11 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
 import Scenario from './pages/Scenario';
 import CoffeeOrderScenario from './pages/CoffeeOrderScenario';
 import DialogScenario from './pages/DialogScenario';
-import SplashScreen from './pages/Home';
+import SplashScreen from './pages/SplashScreen';
+import ScenarioList from './pages/ScenarioList';
 
 import './App.css';
 
@@ -39,7 +39,7 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/" element={<SplashScreen />} />
-        <Route path="/scenarios" element={<Home />} />
+        <Route path="/scenarios" element={<ScenarioList />} />
         <Route path="/scenario/:id" element={<Scenario />} />
         <Route path="/scenario/3" element={<CoffeeOrderScenario />} />
         <Route path="/scenario/2" element={<DialogScenario />} />
