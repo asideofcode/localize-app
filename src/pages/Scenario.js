@@ -71,6 +71,13 @@ const Scenario = () => {
           return;
         }
 
+        data.scenes.forEach(scene => {
+          if (Array.isArray(scene.options)) return;
+  
+          console.warn(`Scene ${scene.id} does not have array of options`);
+          scene.options = [];
+        });
+  
         const [distances, maxDistance] = determineSceneDistances(data.scenes, data.initialStateId);
 
         // Randomize the order of the options
