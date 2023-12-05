@@ -79,11 +79,11 @@ const Scenario = () => {
 
         data.scenes.forEach(scene => {
           if (Array.isArray(scene.options)) return;
-  
+
           console.warn(`Scene ${scene.id} does not have array of options`);
           scene.options = [];
         });
-  
+
         const [distances, maxDistance] = determineSceneDistances(data.scenes, data.initialStateId);
 
         // Randomize the order of the options
@@ -160,6 +160,9 @@ const Scenario = () => {
             {
               section == sections.SLIDES &&
               <Slides
+                changeSlide={() => {
+                  playCorrectSound();
+                }}
                 id={id}
                 slides={data.slides}
                 switchToQuestions={() => {
@@ -206,8 +209,8 @@ function Scene({
   wrongAnswer,
   onComplete
 }) {
-  const [goodFeedback, setGoodFeedback] = useState('');
-  const [badFeedback, setBadFeedback] = useState('');
+  const [goodFeedback, setGoodFeedback] = useState(null);
+  const [badFeedback, setBadFeedback] = useState(null);
   const [clickedOption, setClickedOption] = useState(undefined);
   const handleOptionClick = (option) => {
     setClickedOption(option);
@@ -229,15 +232,22 @@ function Scene({
 
     if (!currentScene.mustBeCorrect || (currentScene.mustBeCorrect && clickedOption.isCorrect)) {
 
-      setGoodFeedback(clickedOption.feedback);
+      setGoodFeedback({
+        message: clickedOption.feedback,
+        imageURL: clickedOption.imageURL,
+      });
+      console.log(clickedOption)
       //Place appropriate xp and/or monetary rewards here by calling currentPlayer's methods.
-      setBadFeedback("");
+      setBadFeedback(null);
 
       correctAnswer(clickedOption);
       setClickedOption(undefined);
     } else {
       wrongAnswer(clickedOption);
-      setBadFeedback(clickedOption.feedback);
+      setBadFeedback({
+        message: clickedOption.feedback,
+        imageURL: clickedOption.imageURL,
+      });
     }
   }
 
@@ -245,7 +255,10 @@ function Scene({
     return <>
       <div>
         <img src={character} className={styles.character} alt="character" />
-        <p className={[styles.speech].join(" ")}>{goodFeedback}</p>
+        {
+          goodFeedback.imageURL && <img src={goodFeedback.imageURL} className={styles.sceneImage} alt="image" />
+        }
+        <p className={[styles.speech].join(" ")}>✅ {goodFeedback.message}</p>
       </div>
 
       {!endOfScene && <button className={styles.ctaButton} onClick={() => setGoodFeedback(null)}>Next</button>}
@@ -254,11 +267,28 @@ function Scene({
     </>
   }
 
+  if (badFeedback) {
+    return <>
+      <div>
+        <img src={character} className={styles.character} alt="character" />
+        {
+          badFeedback.imageURL && <img src={badFeedback.imageURL} className={styles.sceneImage} alt="image" />
+        }
+        <p className={[styles.speech].join(" ")}>❌ {badFeedback.message}</p>
+      </div>
+
+      <button className={styles.ctaButton} onClick={() => setBadFeedback(null)}>Try again</button>
+
+    </>
+  }
+
   return <>
     <h2>Question time!</h2>
-    {goodFeedback && <p>✅ {goodFeedback}</p>}
     <div>
       <img src={character} className={styles.character} alt="character" />
+      {
+        currentScene.imageURL && <img src={currentScene.imageURL} className={styles.sceneImage} alt="image" />
+      }
       <p className={[styles.speech].join(" ")}>{currentScene.narrative}</p>
     </div>
 
@@ -273,8 +303,6 @@ function Scene({
     </ul>
     {!endOfScene && <button disabled={!clickedOption} className={styles.ctaButton} onClick={handleCheckClick}>Check</button>}
     {endOfScene && <button className={styles.ctaButton} onClick={onComplete}>Finish</button>}
-
-    {badFeedback && <p>❌ {badFeedback}</p>}
   </>
 }
 
@@ -289,9 +317,11 @@ const Slides = (props) => {
 
   const onNextSlide = () => {
     setSlideIndex(Math.min(slideIndex + 1, slides.length));
+    props.changeSlide?.();
   }
   const onPreviousSlide = () => {
     setSlideIndex(Math.max(slideIndex - 1, 0));
+    props.changeSlide?.();
   }
 
   if (isAfterLastSlide) {
