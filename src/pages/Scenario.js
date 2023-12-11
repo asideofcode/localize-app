@@ -293,7 +293,7 @@ function Scene({
       }
       <div className={[styles.speech].join(" ")}>
         {
-          currentScene.audioURL && <AudioPlayer audioURL={exampleQuestion} />
+          currentScene.soundURL && <SoundPlayer soundURL={exampleQuestion} />
         }
         {currentScene.narrative}
       </div>
@@ -317,10 +317,10 @@ function Scene({
 }
 
 const MultipleChoiceOption = (props) => {
-  // const audioURL = props.option?.audioURL || exampleQuestion; // TODO: replace with actual audio
+  // const soundURL = props.option?.soundURL || exampleQuestion; // TODO: replace with actual sound
   // const [isPlaying, setIsPlaying] = React.useState(false);
 
-  // const [playSound, { stop: stopSound }] = useSound(audioURL, {
+  // const [playSound, { stop: stopSound }] = useSound(soundURL, {
   //   onplay: () => setIsPlaying(true),
   //   onstop: () => setIsPlaying(false),
   //   onend: () => setIsPlaying(false),
@@ -329,7 +329,7 @@ const MultipleChoiceOption = (props) => {
   return (
     <button onClick={
       () => {
-        // if (audioURL) {
+        // if (soundURL) {
         //   if (isPlaying) {
         //     stopSound();
         //   } else {
@@ -392,10 +392,10 @@ const Slides = (props) => {
   </div>;
 }
 
-const AudioPlayer = (props) => {
+const SoundPlayer = (props) => {
   const [isPlaying, setIsPlaying] = React.useState(false);
 
-  const [playSound, { stop: stopSound }] = useSound(props.audioURL, {
+  const [playSound, { stop: stopSound }] = useSound(props.soundURL, {
     onplay: () => setIsPlaying(true),
     onstop: () => setIsPlaying(false),
     onend: () => setIsPlaying(false),
@@ -403,7 +403,7 @@ const AudioPlayer = (props) => {
 
 
   return (
-    <div className={styles.audioPlayerContainer}>
+    <div className={styles.soundPlayerContainer}>
       {
         !isPlaying ?
           <div onClick={() => playSound()}>🔊 Listen...</div> :
