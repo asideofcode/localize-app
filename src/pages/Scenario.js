@@ -9,6 +9,7 @@ import useSound from 'use-sound';
 
 import correctSound from '../sounds/correct answer.mp3';
 import wrongSound from '../sounds/wrong answer.mp3';
+import exampleQuestion from '../sounds/speech_20231211135246813.mp3';
 // import exampleScenario from './scenario.json';
 
 // Determines distances from the initial scene to all other scenes
@@ -289,7 +290,13 @@ function Scene({
       {
         currentScene.imageURL && <img src={currentScene.imageURL} className={styles.sceneImage} alt="image" />
       }
-      <p className={[styles.speech].join(" ")}>{currentScene.narrative}</p>
+      <div className={[styles.speech].join(" ")}>
+        {
+          currentScene.audioURL && <AudioPlayer audioURL={exampleQuestion} />
+        }
+        {currentScene.narrative}
+      </div>
+
     </div>
 
     <ul className={styles.mcqChoices}>
@@ -350,5 +357,26 @@ const Slides = (props) => {
     </div>
   </div>;
 }
+
+const AudioPlayer = (props) => {
+  const [isPlaying, setIsPlaying] = React.useState(false);
+
+  const [playSound, { stop: stopSound }] = useSound(props.audioURL, {
+    onplay: () => setIsPlaying(true),
+    onstop: () => setIsPlaying(false),
+    onend: () => setIsPlaying(false),
+  });
+
+
+  return (
+    <div className={styles.audioPlayerContainer}>
+      {
+        !isPlaying ? 
+        <div onClick={() => playSound()}>🔊 Listen...</div> :
+        <div onClick={() => stopSound()}>🗣️ Speaking ...</div>
+      }
+    </div>
+  );
+};
 
 export default Scenario;
