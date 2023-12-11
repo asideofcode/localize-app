@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './Scenario.module.css';
 import { fetchScenario, createUser, getPlayerFromFirebase, currentPlayer } from '../backendService';
@@ -149,6 +149,7 @@ const Scenario = () => {
         </div>
 
       </div>
+      <Timer initialTime={3} onDone={() => console.log("timesout")} />
       <div className={styles.card}>
         <button onClick={() => navigate('/')} className={styles.exitButton}>
           x
@@ -302,15 +303,48 @@ function Scene({
     <ul className={styles.mcqChoices}>
       {currentScene.options.map((option, index) => (
         <li key={index}>
-          <button className={`${styles.mcqChoice} ${option === clickedOption ? styles.active : ''}`} key={index} onClick={() => handleOptionClick(option)}>
-            {option.text}
-          </button>
+          <MultipleChoiceOption
+            selected={option === clickedOption}
+            onClick={handleOptionClick}
+            option={option}
+          />
         </li>
       ))}
     </ul>
     {!endOfScene && <button disabled={!clickedOption} className={styles.ctaButton} onClick={handleCheckClick}>Check</button>}
     {endOfScene && <button className={styles.ctaButton} onClick={onComplete}>Finish</button>}
   </>
+}
+
+const MultipleChoiceOption = (props) => {
+  // const audioURL = props.option?.audioURL || exampleQuestion; // TODO: replace with actual audio
+  // const [isPlaying, setIsPlaying] = React.useState(false);
+
+  // const [playSound, { stop: stopSound }] = useSound(audioURL, {
+  //   onplay: () => setIsPlaying(true),
+  //   onstop: () => setIsPlaying(false),
+  //   onend: () => setIsPlaying(false),
+  // });
+
+  return (
+    <button onClick={
+      () => {
+        // if (audioURL) {
+        //   if (isPlaying) {
+        //     stopSound();
+        //   } else {
+        //     playSound();
+        //   }
+        // }
+
+        props.onClick(props.option);
+      }
+    }
+      className={`${styles.mcqChoice} ${props.selected ? styles.active : ''}`}
+    >
+      {props.option?.text}
+    </button>
+  );
 }
 
 const Slides = (props) => {
@@ -371,12 +405,55 @@ const AudioPlayer = (props) => {
   return (
     <div className={styles.audioPlayerContainer}>
       {
-        !isPlaying ? 
-        <div onClick={() => playSound()}>🔊 Listen...</div> :
-        <div onClick={() => stopSound()}>🗣️ Speaking ...</div>
+        !isPlaying ?
+          <div onClick={() => playSound()}>🔊 Listen...</div> :
+          <div onClick={() => stopSound()}>🗣️ Speaking ...</div>
       }
     </div>
   );
 };
+
+const Timer = ({ initialTime, onDone }) => {
+  const [timeLeft, setTimeLeft] = useState(initialTime);
+  const [timerRunning, setTimerRunning] = useState(false);
+
+  const decreaseTime = () => {
+    if (timeLeft === 0) {
+      // Timer is done
+      setTimerRunning(false);
+      setTimeLeft(initialTime);
+      onDone?.();
+      return;
+    }
+
+    setTimeLeft(timeLeft - 1);
+  };
+
+  useEffect(() => {
+    let timeout;
+    if (timerRunning) {
+      timeout = setTimeout(decreaseTime, 1000);
+    }
+    return () => clearTimeout(timeout);
+  }, [timeLeft, timerRunning]);
+
+  const startTimer = () => {
+    setTimerRunning(true);
+  };
+
+  const stopTimer = () => {
+    setTimerRunning(false);
+  };
+
+
+  if (!timerRunning) {
+    return <div onClick={startTimer}>⏰ Start Timer</div>
+  }
+
+  return (
+    <div>⏰ Time Left: {timeLeft}</div>
+  );
+};
+
 
 export default Scenario;
