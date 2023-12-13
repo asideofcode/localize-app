@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './Scenario.module.css';
 import { fetchScenario, createUser, getPlayerFromFirebase, currentPlayer } from '../backendService';
-import character from '../character.svg';
+// import character from '../character.svg';
 import diamond from '../diamond.svg';
 import { useLocalStorage } from "@uidotdev/usehooks";
 import useSound from 'use-sound';
@@ -12,12 +12,16 @@ import wrongSound from '../sounds/wrong answer.mp3';
 import exampleQuestion from '../sounds/speech_20231211135246813.mp3';
 // import exampleScenario from './scenario.json';
 
+const character = "https://firebasestorage.googleapis.com/v0/b/localise-aquamarine.appspot.com/o/oracle.png?alt=media&token=1d069c37-f88f-4f7e-8fcd-712798f3ae1a"
 // Determines distances from the initial scene to all other scenes
 // This is used to determine the progress of the user
 // and relies on all scenarios having a single initial scene and a single ending scene
 function determineSceneDistances(scenes, initialStateId) {
   let distances = {};
   let queue = [{ id: initialStateId, distance: 0, visited: new Set([initialStateId]) }];
+
+  const imageURLs = new Set();
+  const soundURLs = new Set();
 
   while (queue.length > 0) {
     let { id, distance, visited } = queue.shift();
@@ -26,7 +30,12 @@ function determineSceneDistances(scenes, initialStateId) {
 
     const scene = scenes.find(scene => scene.id === id);
     if (scene) {
+      imageURLs.add(scene.imageURL);
+      soundURLs.add(scene.soundURL);
+
       scene.options.forEach(option => {
+        imageURLs.add(option.imageURL);
+
         if ((!scene.mustBeCorrect || (scene.mustBeCorrect && option.isCorrect)) && !visited.has(option.nextScene)) {
           let newVisited = new Set(visited);
           newVisited.add(option.nextScene);
@@ -36,7 +45,7 @@ function determineSceneDistances(scenes, initialStateId) {
     }
   }
 
-  return [distances, Math.max(...Object.values(distances))];
+  return [distances, Math.max(...Object.values(distances)), imageURLs, soundURLs];
 }
 
 const sections = {
@@ -96,7 +105,7 @@ const Scenario = () => {
           scene.options = [];
         });
 
-        const [distances, maxDistance] = determineSceneDistances(data.scenes, data.initialStateId);
+        const [distances, maxDistance, imageURLs, soundURLs] = determineSceneDistances(data.scenes, data.initialStateId);
 
         // Randomize the order of the options
         data.scenes.forEach(scene => {
@@ -121,7 +130,12 @@ const Scenario = () => {
         // ];
         const slides = data.learning_slides || [];
 
+        // TODO: preload sounds
         // Preload images
+        imageURLs.forEach(imageURL => {
+          const img = new Image();
+          img.src = imageURL;
+        });
         slides.forEach((slide) => {
           const img = new Image();
           img.src = slide.imageURL;
