@@ -192,6 +192,7 @@ blockquote.bubble {
   flex-direction: column;
   align-items: center;
   min-height: 500px;
+  width: 100%;
 }
 
 .sceneContainer {
@@ -199,6 +200,7 @@ blockquote.bubble {
   flex-direction: column;
   align-items: center;
   min-height: 500px;
+  width: 100%;
 }
 
 .slideImage {

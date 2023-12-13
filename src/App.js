@@ -25,7 +25,7 @@
 // export default App;
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Outlet, useMatch } from 'react-router-dom';
 import Scenario from './pages/Scenario';
 import CoffeeOrderScenario from './pages/CoffeeOrderScenario';
 import DialogScenario from './pages/DialogScenario';
@@ -39,22 +39,45 @@ const App = () => {
 
 
   return (
-    <div className={styles.card}>
-       {/* <button onClick={() => navigate('/')} className={styles.exitButton}>
-          x
-        </button> */}
-      <Router>
+
+    <Router>
+
       <Routes>
-        <Route path="/" element={<SplashScreen />} />
-        <Route path="/scenarios" element={<ScenarioList />} />
-        <Route path="/scenario/:id" element={<Scenario />} />
+        <Route path="/" element={<Container />}>
+          <Route index element={<SplashScreen />} />
+          <Route path="scenarios" element={<ScenarioList />} />
+          <Route path="scenario/:id" element={<Scenario />} />
+        </Route>
         {/* <Route path="/scenario/3" element={<CoffeeOrderScenario />} /> */}
         {/* <Route path="/scenario/2" element={<DialogScenario />} /> */}
       </Routes>
     </Router>
-    </div>
+
   );
 };
+
+function Container(props) {
+
+  const matchIndex = useMatch('/');
+  return (
+    <div className={styles.card}>
+      {!matchIndex && <ExitButton />}
+      <Outlet />
+    </div>
+  );
+}
+
+function ExitButton() {
+  return (
+    <Link to="/">
+       <div className={styles.exitButton} style={{position: 'relative', top: -30, right: -30}} >
+        x
+       </div>
+    </Link>
+  );
+}
+
+
 
 export default App;
 

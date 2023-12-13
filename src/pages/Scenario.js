@@ -211,9 +211,6 @@ const Scenario = () => {
       </div>
 
       <div className={styles.scenario}>
-        <button onClick={() => navigate('/')} className={styles.exitButton}>
-          x
-        </button>
         {error && error.toString()}
         {loading && <div className={styles.loading}>Loading...</div>}
         {
@@ -418,7 +415,7 @@ const Slides = (props) => {
 
   return <div>
     <div className={styles.slideContainer}>
-      <h2>Time to learn!</h2>
+      <h2>Listen up!</h2>
       {slide.imageURL && <img src={slide.imageURL} className={styles.slideImage} alt="slide image" />}
       <p>{slide.text}</p>
     </div>
