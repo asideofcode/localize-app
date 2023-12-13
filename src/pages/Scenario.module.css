@@ -85,6 +85,8 @@ ul.mcqChoices {
 
 .character {
   width: 200px;
+  margin-bottom: -5px;
+  margin-left: -43px;
 }
 
 
@@ -102,9 +104,10 @@ blockquote.bubble {
   position: relative;
   background: #00aabb;
   border-radius: 20px;
-  border: 1px solid white;
+  border: 1px solid #018694;
   padding: 20px;
   color: white;
+  margin: 0;
   margin-bottom: 10px;
 }
 .speech.challenge {
@@ -204,6 +207,10 @@ blockquote.bubble {
   position: relative;
 }
 
+.sceneContainer > div {
+  width: 100%;
+}
+
 .slideImage {
   max-width: 500px;
   max-height: 200px;
@@ -231,7 +238,7 @@ blockquote.bubble {
 
 .audioPlayerContainer {
   padding: 5px;
-  border: 1px solid white;
+  border: 1px solid #018694;
   border-radius: 5px;
   display: block;
   margin-bottom: 5px;
