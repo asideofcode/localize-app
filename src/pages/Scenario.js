@@ -267,6 +267,8 @@ function Scene({
     }
    
     setShowOracle(false);
+
+    // TODO: add event listener for when the user clicks on the oracle
   }, [currentScene, goodFeedback]);
 
   const endOfScene = !currentScene.options?.length;
