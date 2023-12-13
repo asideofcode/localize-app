@@ -10,6 +10,7 @@ import useSound from 'use-sound';
 import correctSound from '../sounds/correct answer.mp3';
 import wrongSound from '../sounds/wrong answer.mp3';
 import exampleQuestion from '../sounds/speech_20231211135246813.mp3';
+import { useOracle } from '../components/Oracle';
 // import exampleScenario from './scenario.json';
 
 const character = "https://firebasestorage.googleapis.com/v0/b/localise-aquamarine.appspot.com/o/oracle.png?alt=media&token=1d069c37-f88f-4f7e-8fcd-712798f3ae1a"
@@ -86,6 +87,15 @@ const Scenario = () => {
 
   const distance = data.distances ? data.distances[currentSceneId] : -1;
   const maxDistance = data.maxDistance || -1;
+
+  const {setShowOracle, setOracleSpeech} = useOracle("You got this! 🤿");
+
+  // Hide the oracle when the scene changes
+  useEffect(() => {
+    setOracleSpeech(currentScene?.hint || "You got this! 🤿");
+
+    setShowOracle(false);
+  }, [currentScene]);
 
   useEffect(() => {
     setLoading(true);

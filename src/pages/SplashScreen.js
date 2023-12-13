@@ -3,7 +3,7 @@ import styles from './SplashScreen.module.css';
 import scenarioStyles from './Scenario.module.css';
 import { useNavigate } from 'react-router-dom';
 import { images } from '../AssetLibrary';
-import { Oracle } from './ScenarioList';
+import { useOracle } from '../components/Oracle';
 const SplashScreen = () => {
 
   const [proceed, setProceed] = useState(false);
@@ -13,9 +13,10 @@ const SplashScreen = () => {
     navigate("/scenarios");
   }
 
+  useOracle("Hello, I am the Oracle. You can sometimes get help from me by clicking down her.");
+
   return (
       <div className={styles.splashScreen}>
-        <Oracle speech="Hello, I am the Oracle. You can sometimes get help from me by clicking down her." />
         <h1>Localize 🌎</h1>
         <p>Familiarise yourself with your local environment. One day at a time :)</p>
         <img src={images.SPLASHSCREEN}/>
