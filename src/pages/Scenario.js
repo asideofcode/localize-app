@@ -11,9 +11,11 @@ import correctSound from '../sounds/correct answer.mp3';
 import wrongSound from '../sounds/wrong answer.mp3';
 import exampleQuestion from '../sounds/speech_20231211135246813.mp3';
 import { useOracle } from '../components/Oracle';
+import { images } from '../AssetLibrary';
+
 // import exampleScenario from './scenario.json';
 
-const character = "https://firebasestorage.googleapis.com/v0/b/localise-aquamarine.appspot.com/o/oracle.png?alt=media&token=1d069c37-f88f-4f7e-8fcd-712798f3ae1a"
+const character = images.ORACLE_DEFAULT;
 // Determines distances from the initial scene to all other scenes
 // This is used to determine the progress of the user
 // and relies on all scenarios having a single initial scene and a single ending scene
@@ -89,13 +91,6 @@ const Scenario = () => {
   const maxDistance = data.maxDistance || -1;
 
   const {setShowOracle, setOracleSpeech} = useOracle("You got this! 🤿");
-
-  // Hide the oracle when the scene changes
-  useEffect(() => {
-    setOracleSpeech(currentScene?.hint || "You got this! 🤿");
-
-    setShowOracle(false);
-  }, [currentScene]);
 
   useEffect(() => {
     setLoading(true);
@@ -260,6 +255,19 @@ function Scene({
   const handleOptionClick = (option) => {
     setClickedOption(option);
   };
+
+  const {setShowOracle, setOracleSpeech} = useOracle("You got this! 🤿");
+
+  // Hide the oracle when the scene changes
+  useEffect(() => {
+    if (goodFeedback) {
+      setOracleSpeech("See, you got this! 🤿");
+    } else {
+      setOracleSpeech(currentScene?.hint || "You got this! 🤿");
+    }
+   
+    setShowOracle(false);
+  }, [currentScene, goodFeedback]);
 
   const endOfScene = !currentScene.options?.length;
 
