@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import styles from './Home.module.css';
+import styles from './ScenarioList.module.css';
+import scenarioStyles from './Scenario.module.css';
 import { fetchScenarios } from '../backendService';
+import { useNavigate } from 'react-router-dom';
 
 const ScenarioList = () => {
   const [loading, setLoading] = useState(true);
@@ -30,8 +32,13 @@ const ScenarioList = () => {
   }, []);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.scenarioList}>
       <h1 className={styles.title}>Select a Scenario</h1>
+
+
+      <Oracle speech="Hello, I am the Oracle. I will guide you through your journey. Select a scenario and dive in! 🤿
+
+" />
       {error && <p>{error}</p>}
       {
         loading ?
@@ -54,5 +61,33 @@ const ScenarioList = () => {
     </div >
   );
 };
+
+export function Oracle(props) {
+  const [isOpen, setIsOpen] = useState(false)
+  const { speech } = props;
+
+  const style = { position: 'absolute', right: 20, bottom: 20, fontSize: 20 };
+  if (!isOpen) {
+    return (
+      <div style={{
+        ...style,
+        border: '1px solid',
+        padding: '10px',
+        borderRadius: '5px'
+      }} onClick={() => setIsOpen(true)}>
+        Get help from oracle 🆘
+      </div>
+    );
+  }
+
+  return (
+    <div style={style} >
+      <p className={[scenarioStyles.speech, scenarioStyles.oracle].join(" ")}>
+        {speech}
+      </p>
+      <div onClick={() => setIsOpen(false)} style={{ position: 'absolute', top: -10, right: 0 }}>❌</div>
+    </div>
+  );
+}
 
 export default ScenarioList;

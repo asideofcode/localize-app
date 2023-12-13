@@ -33,10 +33,17 @@ import SplashScreen from './pages/SplashScreen';
 import ScenarioList from './pages/ScenarioList';
 
 import './App.css';
+import styles from './pages/Scenario.module.css';
 
 const App = () => {
+
+
   return (
-    <Router>
+    <div className={styles.card}>
+       {/* <button onClick={() => navigate('/')} className={styles.exitButton}>
+          x
+        </button> */}
+      <Router>
       <Routes>
         <Route path="/" element={<SplashScreen />} />
         <Route path="/scenarios" element={<ScenarioList />} />
@@ -45,6 +52,7 @@ const App = () => {
         {/* <Route path="/scenario/2" element={<DialogScenario />} /> */}
       </Routes>
     </Router>
+    </div>
   );
 };
 

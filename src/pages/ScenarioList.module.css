@@ -1,20 +1,9 @@
 
-.container {
-  padding: 20px;
+.scenarioList {
+  /* padding: 20px;
   background-color: #f7f7f7;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.startButton {
-  margin-top: 10px;
-  padding: 5px 15px;
-  background-color: #4CAF50;
-  color: white;
-}
-
-.startButton:hover {
-  background-color: #45a049;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
 }
 
 .container img {

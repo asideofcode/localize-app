@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './Scenario.module.css';
 import { fetchScenario, createUser, getPlayerFromFirebase, currentPlayer } from '../backendService';
 import character from '../character.svg';
@@ -47,11 +47,22 @@ const sections = {
 
 const Scenario = () => {
   let { id } = useParams();
+  let [searchParams, setSearchParams] = useSearchParams();
+  const timed = searchParams.get('timed') === 'true';
+
   let navigate = useNavigate();
+  let { timeLeft, timerDone, startTimer, stopTimer, resetTimer, timerRunning } = useTimer(5);
+
+  useEffect(() => {
+    if (timed && !timerRunning && !timerDone) {
+      startTimer();
+    }
+  }, [timed, startTimer, timerRunning, timerDone]);
 
   const [playCorrectSound, { stopCorrectSound }] = useSound(correctSound);
   const [playWrongSound, { stopWrongSound }] = useSound(wrongSound);
 
+  const [timeRanOut, setTimeRanOut] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentSceneId, setCurrentSceneId] = useState(undefined);
@@ -134,9 +145,50 @@ const Scenario = () => {
 
   }, [id]);
 
+
+  let content = null;
+  if (timed && timerDone) {
+    content = <div>
+      <h2>Time's up!</h2>
+      <p>Time ran out</p>
+    </div>
+  } else if (section == sections.SLIDES) {
+    content = <Slides
+      changeSlide={() => {
+        playCorrectSound();
+      }}
+      id={id}
+      slides={data.slides}
+      switchToQuestions={() => {
+        setSection(sections.MCQ);
+      }}
+    />
+  } else if (section == sections.MCQ) {
+    content = <Scene
+      id={id}
+      currentScene={currentScene}
+      correctAnswer={(clickedOption) => {
+        setPoints(points + 10);
+        setCurrentSceneId(clickedOption.nextScene)
+        playCorrectSound();
+      }}
+      wrongAnswer={() => {
+        setPoints(points - 2);
+        playWrongSound();
+      }}
+      onComplete={() => {
+        setSection(sections.COMPLETE);
+      }}
+    />
+  } else if (section == sections.COMPLETE) {
+    content = <div>
+      <h2>Well done!</h2>
+    </div>
+  }
   return (
     <div className={styles.container}>
       <div className={styles.header}>
+
         <div className={styles.progress}>
           <div className={styles.progressBar} >
             <div className={styles.progressBarInner} style={{ width: `${distance / maxDistance * 100}%` }}></div>
@@ -147,10 +199,18 @@ const Scenario = () => {
         <div className={styles.points}>
           <img src={diamond} className={styles.pointsIcon} alt="diamond" />{points}
         </div>
-
       </div>
-      <Timer initialTime={3} onDone={() => console.log("timesout")} />
-      <div className={styles.card}>
+      <div className={styles.timer}>
+        {
+          timed && (
+            timerRunning ?
+              <p>⏰ {timeLeft}s left</p> :
+              <p>Time ran out</p>
+          )
+        }
+      </div>
+
+      <div className={styles.scenario}>
         <button onClick={() => navigate('/')} className={styles.exitButton}>
           x
         </button>
@@ -159,45 +219,7 @@ const Scenario = () => {
         {
           (!loading && currentScene) &&
           <div>
-            {
-              section == sections.SLIDES &&
-              <Slides
-                changeSlide={() => {
-                  playCorrectSound();
-                }}
-                id={id}
-                slides={data.slides}
-                switchToQuestions={() => {
-                  setSection(sections.MCQ);
-                }}
-              />
-            }
-            {
-              section == sections.MCQ &&
-              <Scene
-                id={id}
-                currentScene={currentScene}
-                correctAnswer={(clickedOption) => {
-                  setPoints(points + 10);
-                  setCurrentSceneId(clickedOption.nextScene)
-                  playCorrectSound();
-                }}
-                wrongAnswer={() => {
-                  setPoints(points - 2);
-                  playWrongSound();
-                }}
-                onComplete={() => {
-                  setSection(sections.COMPLETE);
-                }}
-              />
-            }
-            {
-              section == sections.COMPLETE && (
-                <div>
-                  <h2>Well done!</h2>
-                </div>)
-            }
-
+            {content}
           </div>
         }
       </div>
@@ -255,64 +277,75 @@ function Scene({
 
   if (goodFeedback) {
     return <>
-      <div>
-        <img src={character} className={styles.character} alt="character" />
-        {
-          goodFeedback.imageURL && <img src={goodFeedback.imageURL} className={styles.sceneImage} alt="image" />
-        }
-        <p className={[styles.speech].join(" ")}>✅ {goodFeedback.message}</p>
+      <div className={styles.sceneContainer}>
+        <h2>Yay!</h2>
+        <div>
+          <img src={character} className={styles.character} alt="character" />
+          {
+            goodFeedback.imageURL && <img src={goodFeedback.imageURL} className={styles.sceneImage} alt="image" />
+          }
+          <p className={[styles.speech].join(" ")}>✅ {goodFeedback.message}</p>
+        </div>
       </div>
 
-      {!endOfScene && <button className={styles.ctaButton} onClick={() => setGoodFeedback(null)}>Next</button>}
-      {endOfScene && <button className={styles.ctaButton} onClick={onComplete}>Finish</button>}
-
+      <div className={styles.slideButtonContainer}>
+        {!endOfScene && <button className={styles.ctaButton} onClick={() => setGoodFeedback(null)}>Next</button>}
+        {endOfScene && <button className={styles.ctaButton} onClick={onComplete}>Finish</button>}
+      </div>
     </>
   }
 
   if (badFeedback) {
     return <>
-      <div>
-        <img src={character} className={styles.character} alt="character" />
-        {
-          badFeedback.imageURL && <img src={badFeedback.imageURL} className={styles.sceneImage} alt="image" />
-        }
-        <p className={[styles.speech].join(" ")}>❌ {badFeedback.message}</p>
+      <div className={styles.sceneContainer}>
+        <h2>Oops!</h2>
+        <div>
+          <img src={character} className={styles.character} alt="character" />
+          {
+            badFeedback.imageURL && <img src={badFeedback.imageURL} className={styles.sceneImage} alt="image" />
+          }
+          <p className={[styles.speech].join(" ")}>❌ {badFeedback.message}</p>
+        </div>
       </div>
-
-      <button className={styles.ctaButton} onClick={() => setBadFeedback(null)}>Try again</button>
-
+      <div className={styles.slideButtonContainer}>
+        <button className={styles.ctaButton} onClick={() => setBadFeedback(null)}>Try again</button>
+      </div>
     </>
   }
 
   return <>
-    <h2>Question time!</h2>
-    <div>
-      <img src={character} className={styles.character} alt="character" />
-      {
-        currentScene.imageURL && <img src={currentScene.imageURL} className={styles.sceneImage} alt="image" />
-      }
-      <div className={[styles.speech].join(" ")}>
+    <div className={styles.sceneContainer}>
+      <h2>Question time!</h2>
+      <div>
+        <img src={character} className={styles.character} alt="character" />
         {
-          currentScene.soundURL && <SoundPlayer soundURL={exampleQuestion} />
+          currentScene.imageURL && <img src={currentScene.imageURL} className={styles.sceneImage} alt="image" />
         }
-        {currentScene.narrative}
+        <div className={[styles.speech].join(" ")}>
+          {
+            currentScene.soundURL && <SoundPlayer soundURL={exampleQuestion} />
+          }
+          {currentScene.narrative}
+        </div>
+
       </div>
 
+      <ul className={styles.mcqChoices}>
+        {currentScene.options.map((option, index) => (
+          <li key={index}>
+            <MultipleChoiceOption
+              selected={option === clickedOption}
+              onClick={handleOptionClick}
+              option={option}
+            />
+          </li>
+        ))}
+      </ul>
     </div>
-
-    <ul className={styles.mcqChoices}>
-      {currentScene.options.map((option, index) => (
-        <li key={index}>
-          <MultipleChoiceOption
-            selected={option === clickedOption}
-            onClick={handleOptionClick}
-            option={option}
-          />
-        </li>
-      ))}
-    </ul>
-    {!endOfScene && <button disabled={!clickedOption} className={styles.ctaButton} onClick={handleCheckClick}>Check</button>}
-    {endOfScene && <button className={styles.ctaButton} onClick={onComplete}>Finish</button>}
+    <div className={styles.slideButtonContainer}>
+      {!endOfScene && <button disabled={!clickedOption} className={styles.ctaButton} onClick={handleCheckClick}>Check</button>}
+      {endOfScene && <button className={styles.ctaButton} onClick={onComplete}>Finish</button>}
+    </div>
   </>
 }
 
@@ -368,9 +401,11 @@ const Slides = (props) => {
   if (isAfterLastSlide) {
     return (
       <div>
-        <h2>Question time!</h2>
-        <img src={character} className={styles.character} alt="character" />
-        <p className={[styles.speech, styles.challenge].join(" ")}>If you're ready for an adventure with <b>question time</b> then jump in!</p>
+        <div className={styles.slideContainer}>
+          <h2>Question time!</h2>
+          <img src={character} className={styles.character} alt="character" />
+          <p className={[styles.speech, styles.challenge].join(" ")}>If you're ready for an adventure with <b>question time</b> then jump in!</p>
+        </div>
         <div className={styles.slideButtonContainer}>
           <button className={[styles.ctaButton, styles.challenge].join(" ")} onClick={onPreviousSlide}>Back</button>
           <button className={[styles.ctaButton, styles.challenge].join(" ")} onClick={() => props.switchToQuestions()}>Go!</button>
@@ -382,9 +417,11 @@ const Slides = (props) => {
 
 
   return <div>
-    <h2>Time to learn!</h2>
-    {slide.imageURL && <img src={slide.imageURL} className={styles.slideImage} alt="slide image" />}
-    <p>{slide.text}</p>
+    <div className={styles.slideContainer}>
+      <h2>Time to learn!</h2>
+      {slide.imageURL && <img src={slide.imageURL} className={styles.slideImage} alt="slide image" />}
+      <p>{slide.text}</p>
+    </div>
     <div className={styles.slideButtonContainer}>
       {!isFirstSlide && <button className={[styles.ctaButton, styles.challenge].join(" ")} onClick={onPreviousSlide}>Back</button>}
       <button className={[styles.ctaButton, styles.challenge].join(" ")} onClick={onNextSlide}>Next</button>
@@ -413,16 +450,17 @@ const SoundPlayer = (props) => {
   );
 };
 
-const Timer = ({ initialTime, onDone }) => {
+const useTimer = (initialTime, onDone) => {
   const [timeLeft, setTimeLeft] = useState(initialTime);
   const [timerRunning, setTimerRunning] = useState(false);
+  const [timerDone, setTimerDone] = useState(false);
 
   const decreaseTime = () => {
     if (timeLeft === 0) {
       // Timer is done
       setTimerRunning(false);
       setTimeLeft(initialTime);
-      onDone?.();
+      setTimerDone(true);
       return;
     }
 
@@ -437,23 +475,26 @@ const Timer = ({ initialTime, onDone }) => {
     return () => clearTimeout(timeout);
   }, [timeLeft, timerRunning]);
 
-  const startTimer = () => {
+  const startTimer = useCallback(() => {
     setTimerRunning(true);
-  };
+    setTimeLeft(initialTime); // Reset the time when starting the timer
+  }, [initialTime]);
 
-  const stopTimer = () => {
+  const stopTimer = useCallback(() => {
     setTimerRunning(false);
-  };
+  }, []);
+
+  const resetTimer = useCallback(() => {
+    setTimeLeft(initialTime);
+    setTimerRunning(false);
+    setTimerDone(false);
+  }, [initialTime]);
 
 
-  if (!timerRunning) {
-    return <div onClick={startTimer}>⏰ Start Timer</div>
-  }
-
-  return (
-    <div>⏰ Time Left: {timeLeft}</div>
-  );
+  return { timeLeft, timerDone, startTimer, stopTimer, resetTimer, timerRunning };
 };
+
+
 
 
 export default Scenario;
