@@ -48,19 +48,58 @@ Start by looking through "beginner" and "help-wanted" issues to find an appropri
 All JavaScript must adhere to [JavaScript Standard Style](https://standardjs.com/).
 
 ### CSS Styleguide
-- Use BEM naming convention.
 - Use CSS modules.
 
 ## Project Structure and Development
-- `components/`: UI components like `Button`, `Card`, etc.
-- `hooks/`: Custom React hooks.
-- `images/`: Static images.
-- `lib/`: Libraries and utilities like `assetLibrary.js`.
-- `pages/`: Components for entire pages. Main game engine in `pages/Scenario.js`.
-- `sounds/`: Audio files.
+
+Development of the project is mainly confined to the `./src` directory. Here's a snapshot of the file tree under the `./src` directory for illustration purposes.
+```
+|-- App.css
+|-- App.js
+|-- App.test.js
+|-- components
+|   |-- Container.js
+|   |-- ExitButton.js
+|   |-- MultipleChoiceOption.js
+|   |-- Oracle.js
+|   |-- Scene.js
+|   |-- Slides.js
+|   `-- SoundPlayer.js
+|-- hooks
+|   `-- useTimer.js
+|-- images
+|   `-- diamond.svg
+|-- index.css
+|-- index.js
+|-- lib
+|   |-- assetLibrary.js
+|   |-- backendService.js
+|   `-- processScenes.js
+|-- pages
+|   |-- Scenario.js
+|   |-- Scenario.module.css
+|   |-- ScenarioList.js
+|   |-- ScenarioList.module.css
+|   |-- ScenarioSelection.js
+|   |-- SplashScreen.js
+|   `-- SplashScreen.module.css
+|-- reportWebVitals.js
+|-- setupTests.js
+`-- sounds
+    |-- correctAnswer.mp3
+    |-- exampleQuestion.mp3
+    `-- wrongAnswer.mp3
+```
+
+- `src/components/`: UI components like `Scene`, `Oracle`, etc.
+- `src/hooks/`: Custom React hooks.
+- `src/images/`: Static images.
+- `src/lib/`: Libraries and utilities like `assetLibrary.js`.
+- `src/pages/`: Components for entire pages. Main game engine in `Scenario.js`.
+- `src/sounds/`: Audio files.
 - `docs/SCENARIO.md`: Data schema documentation.
 - Data is stored on Firebase. To modify the schema, update the documentation and migrate the database.
-- The app uses [React Router v6](https://reactrouter.com/docs/en/v6). For new routes, update `App.js`.
+- The app uses [React Router v6](https://reactrouter.com/en/6). For new routes, update `App.js`.
 - The app uses component local state without complex state management systems.
 
 ### Getting Started
