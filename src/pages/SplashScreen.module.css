@@ -1,0 +1,21 @@
+.splashScreen img {
+  max-width: 100%;
+  min-height: 300px;
+  height: 300px;
+}
+
+.startButton {
+  cursor: pointer;
+  font-size: 20px;
+  border: none;
+  padding:  10px 50px;
+  min-width: 100px;
+  background-color: #000;
+  color: #fff;
+  border-radius: 5px;
+  margin: 20px 0;
+}
+
+.startButton:hover {
+  background-color: #252525;
+}

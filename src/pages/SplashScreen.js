@@ -1,34 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import styles from './Home.module.css';
+import styles from './SplashScreen.module.css';
+import scenarioStyles from './Scenario.module.css';
 import { useNavigate } from 'react-router-dom';
-import { images } from '../AssetLibrary';
+import { images } from '../lib/assetLibrary';
+import { useOracle } from '../components/Oracle';
 
 const SplashScreen = () => {
-
-  const [proceed, setProceed] = useState(false);
   let navigate = useNavigate();
+
   const handleStartPress = () => {
-    setProceed(true);
     navigate("/scenarios");
   }
 
+  useOracle("Hello, I am the Oracle. You can sometimes get help from me by clicking down her.");
+
   return (
-    <>
-      <div>
-        <div className={styles.container}>
-          <h1>Welcome to Localise!</h1>
-          <img 
-            src={images.SPLASHSCREEN}/>
-          <div className={styles.selectionArea}>
-            <button
-              className={styles.startButton}
-              onClick={handleStartPress}>
-              Start
-            </button>
-          </div>
+      <div className={styles.splashScreen}>
+        <h1>Localize 🌎</h1>
+        <p>Familiarise yourself with your local environment!</p>
+        <p>We strive to offer scenarios for all skill levels that everyone can enjoy playing every day.</p>
+        
+        <img src={images.SPLASHSCREEN}/>
+        <div>
+          <button
+            className={styles.startButton}
+            onClick={handleStartPress}>
+            Play
+          </button>
         </div>
       </div>
-    </>
   );
 };
 

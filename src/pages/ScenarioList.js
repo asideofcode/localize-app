@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import styles from './Home.module.css';
-import { fetchScenarios } from '../backendService';
+import styles from './ScenarioList.module.css';
+import { fetchScenarios } from '../lib/backendService';
+import {useOracle} from '../components/Oracle';
 
 const ScenarioList = () => {
   const [loading, setLoading] = useState(true);
@@ -29,8 +30,10 @@ const ScenarioList = () => {
 
   }, []);
 
+  useOracle("Hello, I am the Oracle. I will guide you through your journey. Select a scenario and dive in! 🤿");
+
   return (
-    <div className={styles.container}>
+    <div className={styles.scenarioList}>
       <h1 className={styles.title}>Select a Scenario</h1>
       {error && <p>{error}</p>}
       {
