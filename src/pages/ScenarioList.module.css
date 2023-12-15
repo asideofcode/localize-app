@@ -1,4 +1,3 @@
-
 .scenarioList {
   /* padding: 20px;
   background-color: #f7f7f7;
@@ -22,6 +21,16 @@
 .list {
   list-style-type: none;
   padding: 0;
+}
+
+.listItem.difficulty {
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 25px;
+  margin: 0;
+  margin-bottom: 10px;
 }
 
 .listItem {

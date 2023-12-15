@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './ScenarioList.module.css';
-import { fetchScenarios } from '../backendService';
-import { useNavigate } from 'react-router-dom';
+import { fetchScenarios } from '../lib/backendService';
 import {useOracle} from '../components/Oracle';
 
 const ScenarioList = () => {

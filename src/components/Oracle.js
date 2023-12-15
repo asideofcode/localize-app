@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import scenarioStyles from "../pages/Scenario.module.css";
-import { images } from '../AssetLibrary';
+import { images } from '../lib/assetLibrary';
 
 const character = images.ORACLE_DEFAULT;
 
@@ -15,7 +15,8 @@ export default function Oracle(props) {
                 cursor: 'pointer',
                 border: '1px solid',
                 padding: '10px',
-                borderRadius: '5px'
+                borderRadius: '5px',
+                backgroundColor: 'white',
             }} onClick={() => setShowOracle(true)}>
                 Get help from oracle 🆘
             </div>

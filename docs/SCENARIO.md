@@ -10,8 +10,6 @@
     + [Starting Point](#starting-point)
     + [Interpretation of Each Scene](#interpretation-of-each-scene)
 
-
-
 ## Data Structure 
 
 The data structure for this multiple choice game is designed to support interactive scenes, each with various options. Some scenes require correct answers, and each option can provide immediate feedback.
