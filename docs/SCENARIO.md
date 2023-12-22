@@ -21,7 +21,7 @@ The data structure for this multiple choice game is designed to support interact
 
 ### `scenes`
 
-- **Type**: Array of objects
+- **Type**: Array of objects, representing a directed graph
 - **Description**: Contains the details of each interactive scene in the game.
 
 Each object in the `scenes` array represents a scene and has the following structure:
