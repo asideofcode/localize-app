@@ -4,6 +4,7 @@ import scenarioStyles from './Scenario.module.css';
 import { useNavigate } from 'react-router-dom';
 import { images } from '../lib/assetLibrary';
 import { useOracle } from '../components/Oracle';
+import logo from '../images/logo.png';
 
 const SplashScreen = () => {
   let navigate = useNavigate();

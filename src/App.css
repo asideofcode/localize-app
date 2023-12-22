@@ -1,7 +1,25 @@
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   margin: 0;
   padding: 0;
   background-color: #c0ffcc;
-  
+}
+
+.points-enter {
+  opacity: 0.9;
+  transform: scale(0.3); /* Start slightly smaller */
+}
+.points-enter-active {
+  opacity: 1;
+  transform: scale(1.5); /* Scale back to original size */
+  transition: opacity 200ms, transform 200ms;
+}
+.points-exit {
+  opacity: 1;
+  transform: scale(1); /* Start at original size */
+}
+.points-exit-active {
+  opacity: 0.9;
+  transform: scale(0.95); /* Scale down slightly */
+  transition: opacity 200ms, transform 200ms;
 }
