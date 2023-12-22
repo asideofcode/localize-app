@@ -113,7 +113,7 @@ export function Scene({
         <img src={oracleImageURL} className={styles.character} alt="character" />
         {currentScene.imageURL && <img src={currentScene.imageURL} className={styles.sceneImage} alt="image" />}
         <div className={[styles.speech].join(" ")}>
-          {currentScene.soundURL && <SoundPlayer soundURL={exampleQuestion} />}
+          {currentScene.soundURL && <SoundPlayer soundURL={currentScene.soundURL} />}
           {currentScene.narrative}
         </div>
 
